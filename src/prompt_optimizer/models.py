@@ -55,15 +55,43 @@ MODEL_MAPPINGS: Dict[ModelFamily, List[str]] = {
         "gpt-5",
         "gpt-4.1",
         "gpt-4o",
+        "gpt-4-turbo",
+        "gpt-3.5-turbo",
     ],
     ModelFamily.ANTHROPIC: [
-        "claude-4-sonnet",
+        "claude-4",
+        "claude-4.1",
         "claude-3.5-sonnet",
+        "claude-3-opus",
+        "claude-3-haiku",
     ],
     ModelFamily.GOOGLE: [
         "gemini-2.5-pro",
         "gemini-2.5-flash",
+        "gemini-1.5-pro",
+        "gemini-1.5-flash",
     ],
+    ModelFamily.META: [
+        "llama-3.1-70b",
+        "llama-3.1-8b",
+        "llama-3-70b",
+        "llama-3-8b",
+    ],
+    ModelFamily.MISTRAL: [
+        "mixtral-8x7b",
+        "mistral-7b-instruct",
+    ],
+}
+
+# Reverse mapping for quick model name lookup
+MODEL_NAME_MAPPINGS: Dict[str, ModelFamily] = {}
+for family, models in MODEL_MAPPINGS.items():
+    for model in models:
+        MODEL_NAME_MAPPINGS[model] = family
+
+# Family to model name mappings for quick access
+FAMILY_MODEL_MAPPINGS: Dict[str, List[str]] = {
+    family.value: models for family, models in MODEL_MAPPINGS.items()
 }
 
 
@@ -121,3 +149,33 @@ def is_supported_model(model_name: str) -> bool:
         return True
     except ValueError:
         return False
+
+
+def get_model_family_models(family: ModelFamily) -> List[str]:
+    """
+    Get all models for a specific family.
+
+    Args:
+        family: The model family
+
+    Returns:
+        List of model names for the family
+    """
+    return MODEL_MAPPINGS.get(family, [])
+
+
+def get_family_models(family_name: str) -> List[str]:
+    """
+    Get all models for a family by name.
+
+    Args:
+        family_name: The name of the family (e.g., "openai", "anthropic")
+
+    Returns:
+        List of model names for the family
+    """
+    try:
+        family = ModelFamily(family_name)
+        return get_model_family_models(family)
+    except ValueError:
+        return []

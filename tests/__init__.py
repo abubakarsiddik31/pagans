@@ -1,3 +1,3 @@
 """
-Test suite for Prompt Optimizer.
+Test configuration and utilities for the Prompt Optimizer package.
 """
