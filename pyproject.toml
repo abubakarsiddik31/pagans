@@ -1,13 +1,68 @@
 [project]
-name = "prompt-optimizer"
+name = "prompt-rocket"
 version = "0.1.0"
-description = "Add your description here"
+description = "🚀 Blazingly fast prompt optimization for OpenAI, Anthropic, and Google models"
 readme = "README.md"
+license = {text = "MIT"}
 requires-python = ">=3.12"
+keywords = [
+    "ai",
+    "llm",
+    "prompt",
+    "optimization",
+    "openai",
+    "anthropic",
+    "claude",
+    "google",
+    "gemini",
+    "openrouter",
+    "machine-learning",
+    "nlp",
+    "artificial-intelligence"
+]
+authors = [
+    {name = "Prompt Optimizer Team", email = "contact@promptoptimizer.com"}
+]
+maintainers = [
+    {name = "Prompt Optimizer Team", email = "contact@promptoptimizer.com"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = [
     "httpx>=0.28.1",
     "pydantic>=2.11.7",
     "python-dotenv>=1.1.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/abubakarsiddik31/prompt-optimizer"
+Documentation = "https://prompt-optimizer.readthedocs.io/"
+Repository = "https://github.com/abubakarsiddik31/prompt-optimizer"
+Issues = "https://github.com/abubakarsiddik31/prompt-optimizer/issues"
+Changelog = "https://github.com/abubakarsiddik31/prompt-optimizer/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.1.0",
+    "pytest-cov>=6.2.1",
+    "black>=24.0.0",
+    "isort>=5.13.0",
+    "mypy>=1.8.0",
+    "ruff>=0.3.0",
+]
+docs = [
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=2.0.0",
 ]
 
 [dependency-groups]
@@ -16,3 +71,40 @@ dev = [
     "pytest-asyncio>=1.1.0",
     "pytest-cov>=6.2.1",
 ]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "C90", "I", "N", "UP", "YTT", "S", "BLE", "FBT", "B", "A", "COM", "C4", "DTZ", "T10", "DJ", "EM", "EXE", "FA", "ISC", "ICN", "G", "INP", "PIE", "T20", "PYI", "PT", "Q", "RSE", "RET", "SLF", "SLOT", "SIM", "TID", "TCH", "INT", "ARG", "PTH", "ERA", "PD", "PGH", "PL", "TRY", "FLY", "NPY", "AIR", "PERF", "FURB", "LOG", "RUF"]
+ignore = ["S101", "S104", "COM812", "ISC001"]
+
+[tool.black]
+line-length = 88
+target-version = ['py312']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
