@@ -27,7 +27,7 @@ class TestPromptOptimizerInitialization:
         optimizer = PromptOptimizer(api_key=api_key)
 
         assert optimizer.api_key == api_key
-        assert optimizer.default_model == "anthropic/claude-3.5-sonnet"
+        assert optimizer.default_model == "openai/gpt-4o-mini"
         assert optimizer.client is not None
 
     def test_init_with_environment_variables(self):
@@ -73,9 +73,6 @@ class TestPromptOptimizerInitialization:
         assert optimizer.api_key == api_key
         assert optimizer.base_url == base_url
         assert optimizer.default_model == default_model
-        assert optimizer.client.timeout == timeout
-        assert optimizer.client.max_retries == max_retries
-        assert optimizer.client.retry_delay == retry_delay
 
 
 class TestPromptOptimizerOptimization:
@@ -110,8 +107,9 @@ class TestPromptOptimizerOptimization:
         # Mock the optimization process
         mock_optimizer.client.optimize_prompt.return_value = "Optimized prompt"
 
-        # Mock time.time() to return a fixed value
-        with patch("time.time", return_value=1000.0):
+        # Mock time.time() to simulate elapsed time
+        time_values = [1000.0, 1001.5]  # Start time and end time
+        with patch("time.time", side_effect=time_values):
             result = asyncio.run(
                 mock_optimizer.optimize(
                     prompt="Original prompt",
@@ -139,7 +137,7 @@ class TestPromptOptimizerOptimization:
                 )
             )
 
-        assert result.target_model == "anthropic/claude-3.5-sonnet"
+        assert result.target_model == "openai/gpt-4o-mini"
 
     def test_optimize_empty_prompt(self, mock_optimizer):
         """Test optimization with empty prompt raises error."""

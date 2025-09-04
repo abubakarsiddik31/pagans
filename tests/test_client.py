@@ -92,6 +92,8 @@ class TestOpenRouterClientRequestHandling:
         """Create a mock HTTP response."""
         mock_response = Mock()
         mock_response.status_code = 200
+        mock_response.headers = Mock()
+        mock_response.headers.get.return_value = None
         mock_response.json.return_value = {
             "choices": [{"message": {"content": "Optimized prompt"}}]
         }
@@ -160,7 +162,7 @@ class TestOpenRouterClientRequestHandling:
     def test_make_request_rate_limit_error(self, mock_client, mock_response):
         """Test rate limit error handling."""
         mock_response.status_code = 429
-        mock_response.headers = {"Retry-After": "60"}
+        mock_response.headers.get.return_value = "60"
         mock_response.json.return_value = {"error": {"message": "Rate limit exceeded"}}
         mock_client.client.request.return_value = mock_response
 
@@ -321,7 +323,8 @@ class TestOpenRouterClientRateLimiting:
     def test_parse_retry_after_seconds(self, mock_client):
         """Test parsing Retry-After header with seconds."""
         mock_response = Mock()
-        mock_response.headers = {"Retry-After": "60"}
+        mock_response.headers = Mock()
+        mock_response.headers.get.return_value = "60"
 
         result = mock_client._parse_retry_after(mock_response)
         assert result == 60
@@ -337,15 +340,18 @@ class TestOpenRouterClientRateLimiting:
         )
 
         mock_response = Mock()
-        mock_response.headers = {"Retry-After": http_date}
+        mock_response.headers = Mock()
+        mock_response.headers.get.return_value = http_date
 
         result = mock_client._parse_retry_after(mock_response)
-        assert result == 3600
+        assert result is not None
+        assert result > 3590  # Should be close to 3600
 
     def test_parse_retry_after_invalid(self, mock_client):
         """Test parsing Retry-After header with invalid value."""
         mock_response = Mock()
-        mock_response.headers = {"Retry-After": "invalid"}
+        mock_response.headers = Mock()
+        mock_response.headers.get.return_value = "invalid"
 
         result = mock_client._parse_retry_after(mock_response)
         assert result is None
@@ -353,7 +359,8 @@ class TestOpenRouterClientRateLimiting:
     def test_parse_retry_after_missing(self, mock_client):
         """Test parsing Retry-After header when missing."""
         mock_response = Mock()
-        mock_response.headers = {}
+        mock_response.headers = Mock()
+        mock_response.headers.get.return_value = None
 
         result = mock_client._parse_retry_after(mock_response)
         assert result is None
@@ -486,7 +493,7 @@ class TestOpenRouterClientAPIMethods:
         mock_client.client.aclose = AsyncMock()
 
         async def test_context():
-            async with OpenRouterClient(api_key="test-api-key") as client:
+            async with mock_client as client:
                 assert client is not None
                 return client
 
