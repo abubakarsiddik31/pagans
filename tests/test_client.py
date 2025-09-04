@@ -4,20 +4,21 @@ Unit tests for the client module.
 This module contains tests for the OpenRouterClient class and its API interactions.
 """
 
-import pytest
 import asyncio
-from unittest.mock import Mock, AsyncMock, patch, MagicMock
-import httpx
+from datetime import UTC
+from unittest.mock import AsyncMock, Mock, patch
 
-from src.prompt_optimizer.client import OpenRouterClient
-from src.prompt_optimizer.exceptions import (
-    OpenRouterAPIError,
-    NetworkError,
-    TimeoutError,
-    RateLimitError,
+import httpx
+import pytest
+
+from src.pagans.client import OpenRouterClient
+from src.pagans.exceptions import (
     AuthenticationError,
-    QuotaExceededError,
     ModelNotFoundError,
+    NetworkError,
+    OpenRouterAPIError,
+    QuotaExceededError,
+    RateLimitError,
 )
 
 
@@ -77,7 +78,7 @@ class TestOpenRouterClientRequestHandling:
     @pytest.fixture
     def mock_client(self):
         """Create a mock client for testing."""
-        with patch("src.prompt_optimizer.client.httpx.AsyncClient") as mock_httpx_class:
+        with patch("src.pagans.client.httpx.AsyncClient") as mock_httpx_class:
             mock_httpx = AsyncMock()
             mock_httpx_class.return_value = mock_httpx
 
@@ -284,7 +285,7 @@ class TestOpenRouterClientRateLimiting:
     @pytest.fixture
     def mock_client(self):
         """Create a mock client for testing."""
-        with patch("src.prompt_optimizer.client.httpx.AsyncClient") as mock_httpx_class:
+        with patch("src.pagans.client.httpx.AsyncClient") as mock_httpx_class:
             mock_httpx = AsyncMock()
             mock_httpx_class.return_value = mock_httpx
 
@@ -327,12 +328,11 @@ class TestOpenRouterClientRateLimiting:
 
     def test_parse_retry_after_http_date(self, mock_client):
         """Test parsing Retry-After header with HTTP date."""
-        import time
-        from datetime import datetime, timezone
+        from datetime import datetime
 
         # Create a future date
-        future_time = datetime.now(timezone.utc).timestamp() + 3600
-        http_date = datetime.fromtimestamp(future_time, timezone.utc).strftime(
+        future_time = datetime.now(UTC).timestamp() + 3600
+        http_date = datetime.fromtimestamp(future_time, UTC).strftime(
             "%a, %d %b %Y %H:%M:%S GMT"
         )
 
@@ -365,7 +365,7 @@ class TestOpenRouterClientAPIMethods:
     @pytest.fixture
     def mock_client(self):
         """Create a mock client for testing."""
-        with patch("src.prompt_optimizer.client.httpx.AsyncClient") as mock_httpx_class:
+        with patch("src.pagans.client.httpx.AsyncClient") as mock_httpx_class:
             mock_httpx = AsyncMock()
             mock_httpx_class.return_value = mock_httpx
 

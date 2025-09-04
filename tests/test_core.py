@@ -4,17 +4,18 @@ Unit tests for the core module.
 This module contains tests for the PromptOptimizer class and its core functionality.
 """
 
-import pytest
 import asyncio
-from unittest.mock import Mock, AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, patch
 
-from src.prompt_optimizer.core import PromptOptimizer
-from src.prompt_optimizer.models import ModelFamily, OptimizationResult
-from src.prompt_optimizer.exceptions import (
-    PromptOptimizerError,
-    ModelNotFoundError,
+import pytest
+
+from src.pagans.core import PromptOptimizer
+from src.pagans.exceptions import (
     ConfigurationError,
+    ModelNotFoundError,
+    PromptOptimizerError,
 )
+from src.pagans.models import ModelFamily, OptimizationResult
 
 
 class TestPromptOptimizerInitialization:
@@ -83,7 +84,7 @@ class TestPromptOptimizerOptimization:
     @pytest.fixture
     def mock_optimizer(self):
         """Create a mock optimizer for testing."""
-        with patch("src.prompt_optimizer.core.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.core.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 

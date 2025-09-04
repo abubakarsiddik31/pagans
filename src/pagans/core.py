@@ -1,7 +1,7 @@
 """
-Core PromptOptimizer class with family detection logic.
+Core PAGANS class with family detection logic.
 
-This module contains the main PromptOptimizer class that orchestrates
+This module contains the main PAGANS class that orchestrates
 the prompt optimization process by detecting model families and using
 appropriate optimization prompts.
 """
@@ -42,7 +42,7 @@ from .optimizer_prompts import (
 
 class PromptOptimizer:
     """
-    Main PromptOptimizer class for optimizing prompts across different LLM model families.
+    Main PAGANS class for optimizing prompts across different LLM model families.
 
     This class provides the primary interface for prompt optimization, handling
     model family detection, prompt selection, and API integration.
@@ -58,7 +58,7 @@ class PromptOptimizer:
         retry_delay: float = DEFAULT_RETRY_DELAY,
     ):
         """
-        Initialize the PromptOptimizer.
+        Initialize the PAGANS.
 
         Args:
             api_key: OpenRouter API key (if None, tries to get from environment)

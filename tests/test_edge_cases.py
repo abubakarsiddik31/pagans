@@ -5,18 +5,16 @@ This module contains tests for edge cases, boundary conditions,
 and unusual scenarios that might cause issues.
 """
 
-import pytest
 import asyncio
-from unittest.mock import Mock, AsyncMock, patch
-import json
+from unittest.mock import AsyncMock, patch
 
-from src.prompt_optimizer.core import PromptOptimizer
-from src.prompt_optimizer.models import OptimizationResult, ModelFamily
-from src.prompt_optimizer.exceptions import (
+import pytest
+
+from src.pagans.core import PromptOptimizer
+from src.pagans.exceptions import (
     PromptOptimizerError,
-    ModelNotFoundError,
-    ConfigurationError,
 )
+from src.pagans.models import ModelFamily, OptimizationResult
 
 
 class TestExtremeInputHandling:
@@ -25,7 +23,7 @@ class TestExtremeInputHandling:
     @pytest.fixture
     def mock_client(self):
         """Create a mock client for testing."""
-        with patch("src.prompt_optimizer.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -39,10 +37,7 @@ class TestExtremeInputHandling:
         optimizer = PromptOptimizer(api_key="test-key")
 
         result = asyncio.run(
-            optimizer.optimize(
-                prompt="",
-                target_model="openai/gpt-4o"
-            )
+            optimizer.optimize(prompt="", target_model="openai/gpt-4o")
         )
 
         assert isinstance(result, OptimizationResult)
@@ -54,10 +49,7 @@ class TestExtremeInputHandling:
         optimizer = PromptOptimizer(api_key="test-key")
 
         result = asyncio.run(
-            optimizer.optimize(
-                prompt="   \n\t  ",
-                target_model="openai/gpt-4o"
-            )
+            optimizer.optimize(prompt="   \n\t  ", target_model="openai/gpt-4o")
         )
 
         assert isinstance(result, OptimizationResult)
@@ -72,10 +64,7 @@ class TestExtremeInputHandling:
         long_prompt = "Write a comprehensive tutorial about Python programming. " * 2000
 
         result = asyncio.run(
-            optimizer.optimize(
-                prompt=long_prompt,
-                target_model="openai/gpt-4o"
-            )
+            optimizer.optimize(prompt=long_prompt, target_model="openai/gpt-4o")
         )
 
         assert isinstance(result, OptimizationResult)
@@ -89,10 +78,7 @@ class TestExtremeInputHandling:
         unicode_prompt = "Write a Python function using emojis 😀 and special chars: àáâãäå, 中文, русский"
 
         result = asyncio.run(
-            optimizer.optimize(
-                prompt=unicode_prompt,
-                target_model="openai/gpt-4o"
-            )
+            optimizer.optimize(prompt=unicode_prompt, target_model="openai/gpt-4o")
         )
 
         assert isinstance(result, OptimizationResult)
@@ -107,10 +93,7 @@ class TestExtremeInputHandling:
         binary_prompt = "Analyze this data: " + "".join(chr(i) for i in range(32, 127))
 
         result = asyncio.run(
-            optimizer.optimize(
-                prompt=binary_prompt,
-                target_model="openai/gpt-4o"
-            )
+            optimizer.optimize(prompt=binary_prompt, target_model="openai/gpt-4o")
         )
 
         assert isinstance(result, OptimizationResult)
@@ -121,10 +104,7 @@ class TestExtremeInputHandling:
         optimizer = PromptOptimizer(api_key="test-key")
 
         result = asyncio.run(
-            optimizer.optimize(
-                prompt="Hi",
-                target_model="openai/gpt-4o"
-            )
+            optimizer.optimize(prompt="Hi", target_model="openai/gpt-4o")
         )
 
         assert isinstance(result, OptimizationResult)
@@ -138,7 +118,7 @@ class TestModelEdgeCases:
     @pytest.fixture
     def mock_client(self):
         """Create a mock client for testing."""
-        with patch("src.prompt_optimizer.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -153,10 +133,7 @@ class TestModelEdgeCases:
         mock_client.validate_model.return_value = True
 
         result = asyncio.run(
-            optimizer.optimize(
-                prompt="Test prompt",
-                target_model="unknown/model-v123"
-            )
+            optimizer.optimize(prompt="Test prompt", target_model="unknown/model-v123")
         )
 
         # Should still work even with unknown model
@@ -174,15 +151,12 @@ class TestModelEdgeCases:
             "model-with-dashes",
             "model.with.dots",
             "model_underscore",
-            "model@symbol"
+            "model@symbol",
         ]
 
         for model in special_models:
             result = asyncio.run(
-                optimizer.optimize(
-                    prompt="Test prompt",
-                    target_model=model
-                )
+                optimizer.optimize(prompt="Test prompt", target_model=model)
             )
             assert isinstance(result, OptimizationResult)
             assert result.target_model == model
@@ -196,8 +170,7 @@ class TestModelEdgeCases:
 
         result = asyncio.run(
             optimizer.optimize(
-                prompt="Test prompt",
-                target_model="OpenAI/GPT-4O"  # Mixed case
+                prompt="Test prompt", target_model="OpenAI/GPT-4O"  # Mixed case
             )
         )
 
@@ -234,7 +207,7 @@ class TestConfigurationEdgeCases:
 
     def test_extreme_concurrency_values(self):
         """Test handling of extreme concurrency values."""
-        with patch("src.prompt_optimizer.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
             mock_client.optimize_prompt.return_value = "Optimized"
@@ -248,7 +221,7 @@ class TestConfigurationEdgeCases:
                 optimizer.optimize_multiple(
                     prompts=prompts,
                     target_model="openai/gpt-4o",
-                    max_concurrent=100  # Very high concurrency
+                    max_concurrent=100,  # Very high concurrency
                 )
             )
 
@@ -281,7 +254,7 @@ class TestBatchProcessingEdgeCases:
     @pytest.fixture
     def mock_client(self):
         """Create a mock client for testing."""
-        with patch("src.prompt_optimizer.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -295,10 +268,7 @@ class TestBatchProcessingEdgeCases:
         optimizer = PromptOptimizer(api_key="test-key")
 
         results = asyncio.run(
-            optimizer.optimize_multiple(
-                prompts=[],
-                target_model="openai/gpt-4o"
-            )
+            optimizer.optimize_multiple(prompts=[], target_model="openai/gpt-4o")
         )
 
         assert results == []
@@ -309,8 +279,7 @@ class TestBatchProcessingEdgeCases:
 
         results = asyncio.run(
             optimizer.optimize_multiple(
-                prompts=["Single prompt"],
-                target_model="openai/gpt-4o"
+                prompts=["Single prompt"], target_model="openai/gpt-4o"
             )
         )
 
@@ -330,10 +299,7 @@ class TestBatchProcessingEdgeCases:
         ]
 
         results = asyncio.run(
-            optimizer.optimize_multiple(
-                prompts=prompts,
-                target_model="openai/gpt-4o"
-            )
+            optimizer.optimize_multiple(prompts=prompts, target_model="openai/gpt-4o")
         )
 
         assert len(results) == len(prompts)
@@ -348,10 +314,7 @@ class TestBatchProcessingEdgeCases:
         prompts = ["Same prompt"] * 5
 
         results = asyncio.run(
-            optimizer.optimize_multiple(
-                prompts=prompts,
-                target_model="openai/gpt-4o"
-            )
+            optimizer.optimize_multiple(prompts=prompts, target_model="openai/gpt-4o")
         )
 
         assert len(results) == 5
@@ -367,7 +330,7 @@ class TestErrorRecoveryEdgeCases:
     @pytest.fixture
     def failing_client(self):
         """Create a mock client that can simulate various failures."""
-        with patch("src.prompt_optimizer.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -385,7 +348,8 @@ class TestErrorRecoveryEdgeCases:
             call_count += 1
 
             if call_count % 3 == 0:  # Every third call fails
-                from src.prompt_optimizer.exceptions import NetworkError
+                from src.pagans.exceptions import NetworkError
+
                 raise NetworkError("Intermittent failure")
 
             return f"Optimized {call_count}"
@@ -397,10 +361,7 @@ class TestErrorRecoveryEdgeCases:
 
         # This should handle partial failures gracefully
         results = asyncio.run(
-            optimizer.optimize_multiple(
-                prompts=prompts,
-                target_model="openai/gpt-4o"
-            )
+            optimizer.optimize_multiple(prompts=prompts, target_model="openai/gpt-4o")
         )
 
         # Should have some successful results
@@ -413,7 +374,8 @@ class TestErrorRecoveryEdgeCases:
 
         # Simulate complete network failure
         async def network_failure(*args, **kwargs):
-            from src.prompt_optimizer.exceptions import NetworkError
+            from src.pagans.exceptions import NetworkError
+
             raise NetworkError("Network partition")
 
         failing_client.optimize_prompt = network_failure
@@ -421,10 +383,7 @@ class TestErrorRecoveryEdgeCases:
 
         with pytest.raises(PromptOptimizerError):
             asyncio.run(
-                optimizer.optimize(
-                    prompt="Test prompt",
-                    target_model="openai/gpt-4o"
-                )
+                optimizer.optimize(prompt="Test prompt", target_model="openai/gpt-4o")
             )
 
     def test_extreme_memory_pressure(self, failing_client):
@@ -440,7 +399,7 @@ class TestErrorRecoveryEdgeCases:
             optimizer.optimize_multiple(
                 prompts=huge_prompts,
                 target_model="openai/gpt-4o",
-                max_concurrent=2  # Low concurrency to manage memory
+                max_concurrent=2,  # Low concurrency to manage memory
             )
         )
 
@@ -457,8 +416,7 @@ class TestErrorRecoveryEdgeCases:
             tasks = []
             for i in range(50):
                 task = optimizer.optimize(
-                    prompt=f"Rapid request {i}",
-                    target_model="openai/gpt-4o"
+                    prompt=f"Rapid request {i}", target_model="openai/gpt-4o"
                 )
                 tasks.append(task)
 
@@ -478,7 +436,7 @@ class TestDataIntegrity:
     @pytest.fixture
     def mock_client(self):
         """Create a mock client for testing."""
-        with patch("src.prompt_optimizer.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -501,10 +459,7 @@ class TestDataIntegrity:
 
         for original_prompt in test_prompts:
             result = asyncio.run(
-                optimizer.optimize(
-                    prompt=original_prompt,
-                    target_model="openai/gpt-4o"
-                )
+                optimizer.optimize(prompt=original_prompt, target_model="openai/gpt-4o")
             )
 
             assert result.original == original_prompt
@@ -519,7 +474,7 @@ class TestDataIntegrity:
             optimizer.optimize(
                 prompt="Test prompt",
                 target_model="openai/gpt-4o",
-                optimization_notes="Test notes"
+                optimization_notes="Test notes",
             )
         )
 
@@ -534,10 +489,7 @@ class TestDataIntegrity:
         mock_client.optimize_prompt.return_value = "Optimized"
 
         result = asyncio.run(
-            optimizer.optimize(
-                prompt="Test prompt",
-                target_model="openai/gpt-4o"
-            )
+            optimizer.optimize(prompt="Test prompt", target_model="openai/gpt-4o")
         )
 
         # Attempt to modify result (should not affect original)

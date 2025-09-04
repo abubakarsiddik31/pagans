@@ -6,18 +6,16 @@ and data structures for optimization requests and results.
 """
 
 import pytest
-from dataclasses import dataclass, field
-from typing import Optional
 
-from src.prompt_optimizer.models import (
+from src.pagans.models import (
+    FAMILY_MODEL_MAPPINGS,
+    MODEL_NAME_MAPPINGS,
     ModelFamily,
-    OptimizationResult,
     OptimizationRequest,
+    OptimizationResult,
     detect_model_family,
     get_supported_models,
     is_supported_model,
-    MODEL_NAME_MAPPINGS,
-    FAMILY_MODEL_MAPPINGS,
 )
 
 

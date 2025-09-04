@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Simple example of using Prompt Optimizer with OpenAI GPT models.
 
@@ -8,8 +7,10 @@ using the Prompt Optimizer package.
 
 import asyncio
 import os
+
 from dotenv import load_dotenv
-from prompt_optimizer import PromptOptimizer
+
+from pagans import PromptOptimizer
 
 load_dotenv()
 

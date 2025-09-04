@@ -5,18 +5,17 @@ This module contains integration tests that verify the end-to-end functionality
 of the PAGANS system, including prompt optimization across different models.
 """
 
-import pytest
 import asyncio
-from unittest.mock import Mock, AsyncMock, patch
 import time
+from unittest.mock import AsyncMock, patch
 
-from src.prompt_optimizer.core import PromptOptimizer
-from src.prompt_optimizer.models import ModelFamily, OptimizationResult
-from src.prompt_optimizer.exceptions import (
+import pytest
+
+from src.pagans.core import PromptOptimizer
+from src.pagans.exceptions import (
     PromptOptimizerError,
-    ModelNotFoundError,
-    ConfigurationError,
 )
+from src.pagans.models import ModelFamily, OptimizationResult
 
 
 class TestEndToEndOptimization:
@@ -25,7 +24,7 @@ class TestEndToEndOptimization:
     @pytest.fixture
     def mock_client(self):
         """Create a mock OpenRouter client for testing."""
-        with patch("src.prompt_optimizer.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -48,8 +47,7 @@ class TestEndToEndOptimization:
 
         result = asyncio.run(
             optimizer.optimize(
-                prompt="Write a Python function",
-                target_model="openai/gpt-4o"
+                prompt="Write a Python function", target_model="openai/gpt-4o"
             )
         )
 
@@ -66,7 +64,7 @@ class TestEndToEndOptimization:
         result = asyncio.run(
             optimizer.optimize(
                 prompt="Explain machine learning",
-                target_model="anthropic/claude-3.5-sonnet"
+                target_model="anthropic/claude-3.5-sonnet",
             )
         )
 
@@ -82,8 +80,7 @@ class TestEndToEndOptimization:
 
         result = asyncio.run(
             optimizer.optimize(
-                prompt="Create a React component",
-                target_model="google/gemini-2.5-pro"
+                prompt="Create a React component", target_model="google/gemini-2.5-pro"
             )
         )
 
@@ -100,14 +97,11 @@ class TestEndToEndOptimization:
         prompts = [
             "Write a Python function",
             "Explain quantum computing",
-            "Create a REST API"
+            "Create a REST API",
         ]
 
         results = asyncio.run(
-            optimizer.optimize_multiple(
-                prompts=prompts,
-                target_model="openai/gpt-4o"
-            )
+            optimizer.optimize_multiple(prompts=prompts, target_model="openai/gpt-4o")
         )
 
         assert len(results) == 3
@@ -130,8 +124,8 @@ class TestEndToEndOptimization:
                 target_models=[
                     "openai/gpt-4o",
                     "anthropic/claude-3.5-sonnet",
-                    "google/gemini-2.5-pro"
-                ]
+                    "google/gemini-2.5-pro",
+                ],
             )
         )
 
@@ -153,7 +147,7 @@ class TestPerformanceOptimization:
     @pytest.fixture
     def mock_client(self):
         """Create a mock client with timing simulation."""
-        with patch("src.prompt_optimizer.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -172,10 +166,7 @@ class TestPerformanceOptimization:
 
         start_time = time.time()
         result = asyncio.run(
-            optimizer.optimize(
-                prompt="Test prompt",
-                target_model="openai/gpt-4o"
-            )
+            optimizer.optimize(prompt="Test prompt", target_model="openai/gpt-4o")
         )
         end_time = time.time()
 
@@ -192,9 +183,7 @@ class TestPerformanceOptimization:
         start_time = time.time()
         results = asyncio.run(
             optimizer.optimize_multiple(
-                prompts=prompts,
-                target_model="openai/gpt-4o",
-                max_concurrent=3
+                prompts=prompts, target_model="openai/gpt-4o", max_concurrent=3
             )
         )
         end_time = time.time()
@@ -216,7 +205,7 @@ class TestPerformanceOptimization:
             optimizer.optimize(
                 prompt="Test prompt for caching",
                 target_model="openai/gpt-4o",
-                use_cache=True
+                use_cache=True,
             )
         )
 
@@ -225,7 +214,7 @@ class TestPerformanceOptimization:
             optimizer.optimize(
                 prompt="Test prompt for caching",
                 target_model="openai/gpt-4o",
-                use_cache=True
+                use_cache=True,
             )
         )
 
@@ -243,7 +232,7 @@ class TestErrorHandlingAndRecovery:
     @pytest.fixture
     def failing_client(self):
         """Create a mock client that simulates failures."""
-        with patch("src.prompt_optimizer.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -256,15 +245,16 @@ class TestErrorHandlingAndRecovery:
 
                 if call_count == 1:
                     # First call fails
-                    from src.prompt_optimizer.exceptions import NetworkError
+                    from src.pagans.exceptions import NetworkError
+
                     raise NetworkError("Temporary network failure")
-                elif call_count == 2:
+                if call_count == 2:
                     # Second call fails differently
-                    from src.prompt_optimizer.exceptions import RateLimitError
+                    from src.pagans.exceptions import RateLimitError
+
                     raise RateLimitError("Rate limit exceeded", retry_after=1)
-                else:
-                    # Third call succeeds
-                    return "Successfully optimized after retries"
+                # Third call succeeds
+                return "Successfully optimized after retries"
 
             mock_client.optimize_prompt = mock_optimize_with_failures
             mock_client.validate_model.return_value = True
@@ -277,8 +267,7 @@ class TestErrorHandlingAndRecovery:
 
         result = asyncio.run(
             optimizer.optimize(
-                prompt="Test prompt with failures",
-                target_model="openai/gpt-4o"
+                prompt="Test prompt with failures", target_model="openai/gpt-4o"
             )
         )
 
@@ -291,17 +280,15 @@ class TestErrorHandlingAndRecovery:
 
         # Mock persistent failure
         async def always_fail(*args, **kwargs):
-            from src.prompt_optimizer.exceptions import NetworkError
+            from src.pagans.exceptions import NetworkError
+
             raise NetworkError("Persistent network failure")
 
         failing_client.optimize_prompt = always_fail
 
         with pytest.raises(PromptOptimizerError):
             asyncio.run(
-                optimizer.optimize(
-                    prompt="Test prompt",
-                    target_model="openai/gpt-4o"
-                )
+                optimizer.optimize(prompt="Test prompt", target_model="openai/gpt-4o")
             )
 
 
@@ -311,7 +298,7 @@ class TestAdvancedFeatures:
     @pytest.fixture
     def mock_client(self):
         """Create a mock client for advanced feature testing."""
-        with patch("src.prompt_optimizer.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -328,7 +315,7 @@ class TestAdvancedFeatures:
             optimizer.optimize(
                 prompt="Write a technical blog post",
                 target_model="openai/gpt-4o",
-                optimization_notes="Focus on clarity and technical accuracy"
+                optimization_notes="Focus on clarity and technical accuracy",
             )
         )
 
@@ -336,11 +323,11 @@ class TestAdvancedFeatures:
 
     def test_context_manager_usage(self, mock_client):
         """Test using PromptOptimizer as a context manager."""
+
         async def test_context_manager():
             async with PromptOptimizer(api_key="test-key") as optimizer:
                 result = await optimizer.optimize(
-                    prompt="Test prompt",
-                    target_model="openai/gpt-4o"
+                    prompt="Test prompt", target_model="openai/gpt-4o"
                 )
                 return result
 
@@ -358,7 +345,7 @@ class TestAdvancedFeatures:
                 "OPENROUTER_BASE_URL": "https://custom.api.url",
                 "DEFAULT_OPTIMIZER_MODEL": "anthropic/claude-3.5-sonnet",
             },
-            clear=True
+            clear=True,
         ):
             optimizer = PromptOptimizer()
 

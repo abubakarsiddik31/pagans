@@ -1,5 +1,5 @@
 """
-Constants and configuration values for Prompt Optimizer.
+Constants and configuration values for PAGANS.
 
 This module contains all the default values, environment variable names,
 and other constants used throughout the package.

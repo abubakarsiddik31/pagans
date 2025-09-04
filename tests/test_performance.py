@@ -5,15 +5,15 @@ This module contains performance benchmarks and stress tests to ensure
 PAGANS can handle various load scenarios efficiently.
 """
 
-import pytest
 import asyncio
-import time
-from unittest.mock import Mock, AsyncMock, patch
-from concurrent.futures import ThreadPoolExecutor
 import statistics
+import time
+from unittest.mock import AsyncMock, patch
 
-from src.prompt_optimizer.core import PromptOptimizer
-from src.prompt_optimizer.models import OptimizationResult
+import pytest
+
+from src.pagans.core import PromptOptimizer
+from src.pagans.models import OptimizationResult
 
 
 class TestPerformanceBenchmarks:
@@ -22,7 +22,7 @@ class TestPerformanceBenchmarks:
     @pytest.fixture
     def fast_mock_client(self):
         """Create a mock client with fast response times."""
-        with patch("src.prompt_optimizer.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -38,7 +38,7 @@ class TestPerformanceBenchmarks:
     @pytest.fixture
     def slow_mock_client(self):
         """Create a mock client with realistic response times."""
-        with patch("src.prompt_optimizer.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -59,7 +59,7 @@ class TestPerformanceBenchmarks:
             result = asyncio.run(
                 optimizer.optimize(
                     prompt="Write a Python function to calculate fibonacci numbers",
-                    target_model="openai/gpt-4o"
+                    target_model="openai/gpt-4o",
                 )
             )
             return result
@@ -78,15 +78,13 @@ class TestPerformanceBenchmarks:
             "Explain machine learning",
             "Create a React component",
             "Design a database schema",
-            "Write a REST API"
+            "Write a REST API",
         ]
 
         def optimize_batch():
             results = asyncio.run(
                 optimizer.optimize_multiple(
-                    prompts=prompts,
-                    target_model="openai/gpt-4o",
-                    max_concurrent=3
+                    prompts=prompts, target_model="openai/gpt-4o", max_concurrent=3
                 )
             )
             return results
@@ -105,8 +103,7 @@ class TestPerformanceBenchmarks:
             tasks = []
             for i in range(10):
                 task = optimizer.optimize(
-                    prompt=f"Test prompt {i}",
-                    target_model="openai/gpt-4o"
+                    prompt=f"Test prompt {i}", target_model="openai/gpt-4o"
                 )
                 tasks.append(task)
 
@@ -127,13 +124,12 @@ class TestPerformanceBenchmarks:
         optimizer = PromptOptimizer(api_key="test-key")
 
         # Create a large prompt (approximately 10KB)
-        large_prompt = "Write a comprehensive guide about " + "Python programming " * 500
+        large_prompt = (
+            "Write a comprehensive guide about " + "Python programming " * 500
+        )
 
         result = asyncio.run(
-            optimizer.optimize(
-                prompt=large_prompt,
-                target_model="openai/gpt-4o"
-            )
+            optimizer.optimize(prompt=large_prompt, target_model="openai/gpt-4o")
         )
 
         assert isinstance(result, OptimizationResult)
@@ -156,7 +152,7 @@ class TestPerformanceBenchmarks:
                 optimizer.optimize_multiple(
                     prompts=prompts,
                     target_model="openai/gpt-4o",
-                    max_concurrent=min(batch_size, 5)  # Cap concurrency
+                    max_concurrent=min(batch_size, 5),  # Cap concurrency
                 )
             )
             end_time = time.time()
@@ -165,9 +161,9 @@ class TestPerformanceBenchmarks:
             avg_time_per_prompt = total_time / batch_size
 
             performance_results[batch_size] = {
-                'total_time': total_time,
-                'avg_time_per_prompt': avg_time_per_prompt,
-                'results_count': len(results)
+                "total_time": total_time,
+                "avg_time_per_prompt": avg_time_per_prompt,
+                "results_count": len(results),
             }
 
         # Verify that larger batches don't have disproportionately worse performance
@@ -175,8 +171,8 @@ class TestPerformanceBenchmarks:
             prev_batch = batch_sizes[batch_sizes.index(batch_size) - 1]
             scaling_factor = batch_size / prev_batch
 
-            current_avg = performance_results[batch_size]['avg_time_per_prompt']
-            prev_avg = performance_results[prev_batch]['avg_time_per_prompt']
+            current_avg = performance_results[batch_size]["avg_time_per_prompt"]
+            prev_avg = performance_results[prev_batch]["avg_time_per_prompt"]
 
             # Allow some degradation but not more than linear scaling
             assert current_avg <= prev_avg * scaling_factor * 1.5
@@ -191,22 +187,14 @@ class TestPerformanceBenchmarks:
         # First optimization (no cache)
         start_time = time.time()
         result1 = asyncio.run(
-            optimizer.optimize(
-                prompt=prompt,
-                target_model=target_model,
-                use_cache=True
-            )
+            optimizer.optimize(prompt=prompt, target_model=target_model, use_cache=True)
         )
         first_duration = time.time() - start_time
 
         # Second optimization (should use cache)
         start_time = time.time()
         result2 = asyncio.run(
-            optimizer.optimize(
-                prompt=prompt,
-                target_model=target_model,
-                use_cache=True
-            )
+            optimizer.optimize(prompt=prompt, target_model=target_model, use_cache=True)
         )
         second_duration = time.time() - start_time
 
@@ -221,7 +209,7 @@ class TestStressTests:
     @pytest.fixture
     def resilient_mock_client(self):
         """Create a mock client that can handle high load."""
-        with patch("src.prompt_optimizer.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -253,8 +241,7 @@ class TestStressTests:
             tasks = []
             for i in range(50):
                 task = optimizer.optimize(
-                    prompt=f"Stress test prompt {i}",
-                    target_model="openai/gpt-4o"
+                    prompt=f"Stress test prompt {i}", target_model="openai/gpt-4o"
                 )
                 tasks.append(task)
 
@@ -280,7 +267,8 @@ class TestStressTests:
 
         # Create a very large batch
         large_batch = [
-            f"Large batch prompt {i} with some additional content to increase size " * 10
+            f"Large batch prompt {i} with some additional content to increase size "
+            * 10
             for i in range(100)
         ]
 
@@ -288,7 +276,7 @@ class TestStressTests:
             optimizer.optimize_multiple(
                 prompts=large_batch,
                 target_model="openai/gpt-4o",
-                max_concurrent=10  # Limit concurrency for memory management
+                max_concurrent=10,  # Limit concurrency for memory management
             )
         )
 
@@ -297,7 +285,7 @@ class TestStressTests:
         # Verify results integrity
         for i, result in enumerate(results):
             assert isinstance(result, OptimizationResult)
-            assert f"Optimized prompt" in result.optimized
+            assert "Optimized prompt" in result.optimized
 
     def test_long_running_stability(self, resilient_mock_client):
         """Test stability during long-running operations."""
@@ -313,7 +301,7 @@ class TestStressTests:
                 for i in range(5):  # 5 concurrent requests per iteration
                     task = optimizer.optimize(
                         prompt=f"Long running test prompt {len(results) + i}",
-                        target_model="openai/gpt-4o"
+                        target_model="openai/gpt-4o",
                     )
                     batch_tasks.append(task)
 
@@ -343,7 +331,7 @@ class TestResourceManagement:
     @pytest.fixture
     def mock_client_with_cleanup(self):
         """Create a mock client that tracks cleanup."""
-        with patch("src.prompt_optimizer.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -362,13 +350,13 @@ class TestResourceManagement:
 
     def test_proper_resource_cleanup(self, mock_client_with_cleanup):
         """Test that resources are properly cleaned up."""
+
         async def test_cleanup():
             optimizer = PromptOptimizer(api_key="test-key")
 
             # Use the optimizer
             result = await optimizer.optimize(
-                prompt="Test prompt",
-                target_model="openai/gpt-4o"
+                prompt="Test prompt", target_model="openai/gpt-4o"
             )
 
             # Explicit cleanup
@@ -384,11 +372,11 @@ class TestResourceManagement:
 
     def test_context_manager_cleanup(self, mock_client_with_cleanup):
         """Test cleanup when using context manager."""
+
         async def test_context_cleanup():
             async with PromptOptimizer(api_key="test-key") as optimizer:
                 result = await optimizer.optimize(
-                    prompt="Test prompt",
-                    target_model="openai/gpt-4o"
+                    prompt="Test prompt", target_model="openai/gpt-4o"
                 )
                 return result
 
@@ -408,8 +396,7 @@ class TestResourceManagement:
             start = time.time()
             result = asyncio.run(
                 optimizer.optimize(
-                    prompt=f"Connection test {i}",
-                    target_model="openai/gpt-4o"
+                    prompt=f"Connection test {i}", target_model="openai/gpt-4o"
                 )
             )
             end = time.time()

@@ -1,16 +1,16 @@
 """
-Custom exceptions for Prompt Optimizer.
+Custom exceptions for PAGANS.
 
 This module defines the exception hierarchy used throughout the package.
 """
 
-from typing import Optional, Any
+from typing import Any
 
 
 class PromptOptimizerError(Exception):
     """Base exception class for all Prompt Optimizer errors."""
 
-    def __init__(self, message: str, details: Optional[Any] = None):
+    def __init__(self, message: str, details: Any | None = None):
         self.message = message
         self.details = details
         super().__init__(self.message)
@@ -22,8 +22,8 @@ class OpenRouterAPIError(PromptOptimizerError):
     def __init__(
         self,
         message: str,
-        status_code: Optional[int] = None,
-        response_data: Optional[dict] = None,
+        status_code: int | None = None,
+        response_data: dict | None = None,
     ):
         super().__init__(message, response_data)
         self.status_code = status_code
@@ -41,13 +41,9 @@ class ModelNotFoundError(PromptOptimizerError):
 class ConfigurationError(PromptOptimizerError):
     """Exception raised when configuration is invalid or missing."""
 
-    pass
-
 
 class NetworkError(PromptOptimizerError):
     """Exception raised when network-related errors occur."""
-
-    pass
 
 
 class TimeoutError(PromptOptimizerError):
@@ -61,7 +57,7 @@ class TimeoutError(PromptOptimizerError):
 class RateLimitError(PromptOptimizerError):
     """Exception raised when rate limits are exceeded."""
 
-    def __init__(self, retry_after: Optional[int] = None):
+    def __init__(self, retry_after: int | None = None):
         message = "Rate limit exceeded"
         if retry_after:
             message += f". Please wait {retry_after} seconds before trying again."
@@ -71,16 +67,10 @@ class RateLimitError(PromptOptimizerError):
 class ValidationError(PromptOptimizerError):
     """Exception raised when input validation fails."""
 
-    pass
-
 
 class AuthenticationError(PromptOptimizerError):
     """Exception raised when authentication fails."""
 
-    pass
-
 
 class QuotaExceededError(PromptOptimizerError):
     """Exception raised when API quota is exceeded."""
-
-    pass

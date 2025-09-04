@@ -1,5 +1,5 @@
 """
-Core data models and enums for Prompt Optimizer.
+Core data models and enums for PAGANS.
 
 This module contains the ModelFamily enum, model name mappings,
 and data structures for optimization requests and results.
@@ -8,7 +8,7 @@ and data structures for optimization requests and results.
 from dataclasses import dataclass
 from enum import Enum
 
-from prompt_optimizer.constants import (
+from pagans.constants import (
     FAMILY_ANTHROPIC,
     FAMILY_GOOGLE,
     FAMILY_OPENAI,

@@ -1,5 +1,5 @@
 """
-OpenRouter API client for Prompt Optimizer.
+OpenRouter API client for PAGANS.
 
 This module provides a robust client for interacting with the OpenRouter API
 with proper error handling, rate limiting, and retry logic.

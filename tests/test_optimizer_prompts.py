@@ -4,23 +4,22 @@ Unit tests for the optimizer prompts module.
 This module contains tests for the optimization prompts and prompt manager functionality.
 """
 
-import pytest
 from unittest.mock import Mock
 
-from src.prompt_optimizer.optimizer_prompts import (
-    get_optimization_prompt,
-    get_optimization_description,
-    get_supported_families,
-    OptimizationPromptManager,
+import pytest
+
+from src.pagans.optimizer_prompts import (
     BaseOptimizationPrompt,
+    OptimizationPromptManager,
+    get_optimization_description,
+    get_optimization_prompt,
+    get_supported_families,
 )
-from src.prompt_optimizer.optimizer_prompts.openai import OPENAI_OPTIMIZATION_PROMPT
-from src.prompt_optimizer.optimizer_prompts.anthropic import (
+from src.pagans.optimizer_prompts.anthropic import (
     ANTHROPIC_OPTIMIZATION_PROMPT,
 )
-from src.prompt_optimizer.optimizer_prompts.google import GOOGLE_OPTIMIZATION_PROMPT
-from src.prompt_optimizer.optimizer_prompts.meta import META_OPTIMIZATION_PROMPT
-from src.prompt_optimizer.optimizer_prompts.mistral import MISTRAL_OPTIMIZATION_PROMPT
+from src.pagans.optimizer_prompts.google import GOOGLE_OPTIMIZATION_PROMPT
+from src.pagans.optimizer_prompts.openai import OPENAI_OPTIMIZATION_PROMPT
 
 
 class TestBaseOptimizationPrompt:
@@ -193,28 +192,6 @@ class TestFamilySpecificPrompts:
         assert "Test prompt" in prompt
         assert "Return ONLY the optimized prompt" in prompt
 
-    def test_meta_prompt_structure(self):
-        """Test that Meta prompt has correct structure."""
-        prompt = META_OPTIMIZATION_PROMPT.get_prompt(
-            original_prompt="Test prompt", target_model="llama-3.1-70b"
-        )
-
-        assert "Meta's Llama models" in prompt
-        assert "llama-3.1-70b" in prompt
-        assert "Test prompt" in prompt
-        assert "Return ONLY the optimized prompt" in prompt
-
-    def test_mistral_prompt_structure(self):
-        """Test that Mistral prompt has correct structure."""
-        prompt = MISTRAL_OPTIMIZATION_PROMPT.get_prompt(
-            original_prompt="Test prompt", target_model="mixtral-8x7b"
-        )
-
-        assert "Mistral models" in prompt
-        assert "mixtral-8x7b" in prompt
-        assert "Test prompt" in prompt
-        assert "Return ONLY the optimized prompt" in prompt
-
     def test_openai_description(self):
         """Test that OpenAI description is correct."""
         description = OPENAI_OPTIMIZATION_PROMPT.get_description()
@@ -238,22 +215,6 @@ class TestFamilySpecificPrompts:
         assert isinstance(description, str)
         assert len(description) > 0
         assert "Google" in description
-
-    def test_meta_description(self):
-        """Test that Meta description is correct."""
-        description = META_OPTIMIZATION_PROMPT.get_description()
-
-        assert isinstance(description, str)
-        assert len(description) > 0
-        assert "Meta" in description
-
-    def test_mistral_description(self):
-        """Test that Mistral description is correct."""
-        description = MISTRAL_OPTIMIZATION_PROMPT.get_description()
-
-        assert isinstance(description, str)
-        assert len(description) > 0
-        assert "Mistral" in description
 
 
 class TestGlobalPromptFunctions:
