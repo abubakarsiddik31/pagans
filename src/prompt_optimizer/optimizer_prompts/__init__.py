@@ -9,18 +9,12 @@ from .base import BaseOptimizationPrompt, OptimizationPromptManager
 from .openai import OPENAI_OPTIMIZATION_PROMPT
 from .anthropic import ANTHROPIC_OPTIMIZATION_PROMPT
 from .google import GOOGLE_OPTIMIZATION_PROMPT
-from .meta import META_OPTIMIZATION_PROMPT
-from .mistral import MISTRAL_OPTIMIZATION_PROMPT
 
-# Create a global prompt manager instance
 _prompt_manager = OptimizationPromptManager()
 
-# Register all family-specific prompts
 _prompt_manager.register_prompt("openai", OPENAI_OPTIMIZATION_PROMPT)
 _prompt_manager.register_prompt("anthropic", ANTHROPIC_OPTIMIZATION_PROMPT)
 _prompt_manager.register_prompt("google", GOOGLE_OPTIMIZATION_PROMPT)
-_prompt_manager.register_prompt("meta", META_OPTIMIZATION_PROMPT)
-_prompt_manager.register_prompt("mistral", MISTRAL_OPTIMIZATION_PROMPT)
 
 
 def get_optimization_prompt(
@@ -75,8 +69,6 @@ __all__ = [
     "OPENAI_OPTIMIZATION_PROMPT",
     "ANTHROPIC_OPTIMIZATION_PROMPT",
     "GOOGLE_OPTIMIZATION_PROMPT",
-    "META_OPTIMIZATION_PROMPT",
-    "MISTRAL_OPTIMIZATION_PROMPT",
     "get_optimization_prompt",
     "get_optimization_description",
     "get_supported_families",

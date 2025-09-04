@@ -65,7 +65,6 @@ class OptimizationPromptManager:
         return list(self._prompts.keys())
 
 
-# Base template that can be extended by specific families
 BASE_OPTIMIZATION_TEMPLATE = """
 You are an expert at optimizing prompts for {model_family} models.
 

@@ -12,8 +12,6 @@ from typing import Dict, List, Optional
 from src.prompt_optimizer.constants import (
     FAMILY_ANTHROPIC,
     FAMILY_GOOGLE,
-    FAMILY_META,
-    FAMILY_MISTRAL,
     FAMILY_OPENAI,
 )
 
@@ -24,8 +22,6 @@ class ModelFamily(Enum):
     OPENAI = FAMILY_OPENAI
     ANTHROPIC = FAMILY_ANTHROPIC
     GOOGLE = FAMILY_GOOGLE
-    META = FAMILY_META
-    MISTRAL = FAMILY_MISTRAL
 
 
 @dataclass
@@ -55,41 +51,23 @@ MODEL_MAPPINGS: Dict[ModelFamily, List[str]] = {
         "gpt-5",
         "gpt-4.1",
         "gpt-4o",
-        "gpt-4-turbo",
-        "gpt-3.5-turbo",
     ],
     ModelFamily.ANTHROPIC: [
         "claude-4",
         "claude-4.1",
-        "claude-3.5-sonnet",
-        "claude-3-opus",
-        "claude-3-haiku",
+        "claude-3.7-sonnet",
     ],
     ModelFamily.GOOGLE: [
         "gemini-2.5-pro",
         "gemini-2.5-flash",
-        "gemini-1.5-pro",
-        "gemini-1.5-flash",
-    ],
-    ModelFamily.META: [
-        "llama-3.1-70b",
-        "llama-3.1-8b",
-        "llama-3-70b",
-        "llama-3-8b",
-    ],
-    ModelFamily.MISTRAL: [
-        "mixtral-8x7b",
-        "mistral-7b-instruct",
     ],
 }
 
-# Reverse mapping for quick model name lookup
 MODEL_NAME_MAPPINGS: Dict[str, ModelFamily] = {}
 for family, models in MODEL_MAPPINGS.items():
     for model in models:
         MODEL_NAME_MAPPINGS[model] = family
 
-# Family to model name mappings for quick access
 FAMILY_MODEL_MAPPINGS: Dict[str, List[str]] = {
     family.value: models for family, models in MODEL_MAPPINGS.items()
 }
@@ -115,7 +93,6 @@ def detect_model_family(model_name: str) -> ModelFamily:
             if model.lower() == model_name:
                 return family
 
-    # Try partial matching for common variations
     for family, models in MODEL_MAPPINGS.items():
         for model in models:
             if model_name in model.lower() or model.lower() in model_name:

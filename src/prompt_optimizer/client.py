@@ -64,8 +64,6 @@ class OpenRouterClient:
         self.timeout = timeout
         self.max_retries = max_retries
         self.retry_delay = retry_delay
-
-        # Initialize HTTP client
         self.client = httpx.AsyncClient(
             base_url=self.base_url,
             timeout=timeout,
@@ -74,8 +72,6 @@ class OpenRouterClient:
                 "Authorization": f"Bearer {api_key}",
             },
         )
-
-        # Rate limiting state
         self.last_request_time = 0
         self.rate_limit_delay = 0
 
@@ -105,7 +101,6 @@ class OpenRouterClient:
         Raises:
             Various exceptions based on error type
         """
-        # Rate limiting
         await self._enforce_rate_limit()
 
         url = f"{self.base_url}{endpoint}"
@@ -121,11 +116,9 @@ class OpenRouterClient:
                     headers=headers,
                 )
 
-                # Handle successful response
                 if response.status_code == 200:
                     return response.json()
 
-                # Handle different error status codes
                 if response.status_code == 401:
                     raise AuthenticationError("Invalid API key")
                 elif response.status_code == 403:
@@ -168,7 +161,6 @@ class OpenRouterClient:
                 RateLimitError,
                 QuotaExceededError,
             ):
-                # These errors should not be retried
                 raise
 
     def _parse_retry_after(self, response: httpx.Response) -> Optional[int]:
@@ -178,7 +170,6 @@ class OpenRouterClient:
             try:
                 return int(retry_after)
             except ValueError:
-                # Try parsing HTTP date
                 try:
                     retry_time = time.strptime(retry_after, "%a, %d %b %Y %H:%M:%S GMT")
                     return int(retry_time - time.time())
@@ -190,13 +181,11 @@ class OpenRouterClient:
         """Enforce rate limiting by waiting if necessary."""
         current_time = time.time()
 
-        # Check if we need to wait due to rate limiting
         if self.rate_limit_delay > 0:
             wait_time = self.rate_limit_delay - (current_time - self.last_request_time)
             if wait_time > 0:
                 await asyncio.sleep(wait_time)
 
-        # Update last request time
         self.last_request_time = time.time()
 
     async def optimize_prompt(
@@ -240,7 +229,6 @@ class OpenRouterClient:
             data=request_data,
         )
 
-        # Extract the optimized prompt from the response
         if "choices" not in response_data or len(response_data["choices"]) == 0:
             raise OpenRouterAPIError("No choices in response")
 

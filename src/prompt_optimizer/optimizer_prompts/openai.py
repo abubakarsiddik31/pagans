@@ -5,8 +5,6 @@ This module contains detailed, research-specific optimization prompts
 for OpenAI's GPT models based on official documentation and best practices.
 """
 
-from typing import Dict, Any
-
 from .base import BaseOptimizationPrompt
 
 
@@ -21,33 +19,31 @@ class OpenAIOptimizationPrompt(BaseOptimizationPrompt):
         """
 
         family_specific_guidelines = """
-OpenAI GPT models work best with:
-- Clear, direct instructions with specific action verbs
-- Step-by-step breakdowns for complex tasks
-- Well-structured formatting with headers, bullet points, and code blocks
-- Context setting at the beginning of the prompt
-- Examples when helpful for demonstrating expected output
-- Avoiding overly verbose or ambiguous language
+        OpenAI GPT models work best with:
+        - Clear, direct instructions with specific action verbs
+        - Step-by-step breakdowns for complex tasks
+        - Well-structured formatting with headers, bullet points, and code blocks
+        - Context setting at the beginning of the prompt
+        - Examples when helpful for demonstrating expected output
+        - Avoiding overly verbose or ambiguous language
 
-Key optimization principles for OpenAI models:
-1. Be specific about the desired output format
-2. Include constraints and guidelines when needed
-3. Use role-playing to set the context effectively
-4. Break down complex tasks into manageable steps
-5. Provide examples of good and bad outputs when applicable
-6. Use clear formatting with markdown for better readability
-7. Specify the tone and style when important for the task
-8. Include relevant context and background information
-9. Use system-level instructions for consistent behavior
-10. Avoid leading questions that bias the response
+        Key optimization principles for OpenAI models:
+        1. Be specific about the desired output format
+        2. Include constraints and guidelines when needed
+        3. Use role-playing to set the context effectively
+        4. Break down complex tasks into manageable steps
+        5. Provide examples of good and bad outputs when applicable
+        6. Use clear formatting with markdown for better readability
+        7. Specify the tone and style when important for the task
+        8. Include relevant context and background information
+        9. Use system-level instructions for consistent behavior
+        10. Avoid leading questions that bias the response
 
-Model-specific considerations:
-- GPT-5: Enhanced reasoning capabilities, can handle more complex instructions
-- GPT-4.1: Improved instruction following and consistency
-- GPT-4o: Optimized for multimodal tasks and faster response times
-- GPT-4-turbo: Good balance of performance and cost-effectiveness
-- GPT-3.5-turbo: Best for simple, straightforward tasks
-"""
+        Model-specific considerations:
+        - GPT-5: Enhanced reasoning capabilities, can handle more complex instructions
+        - GPT-4.1: Improved instruction following and consistency
+        - GPT-4o: Optimized for multimodal tasks and faster response times
+        """
 
         return f"""
 You are an expert at optimizing prompts for OpenAI's GPT models ({', '.join(['GPT-5', 'GPT-4.1', 'GPT-4o', 'GPT-4-turbo', 'GPT-3.5-turbo'])}).
