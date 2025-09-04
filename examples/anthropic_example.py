@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Simple example of using Prompt Optimizer with Anthropic Claude models.
 
@@ -8,7 +7,12 @@ using the Prompt Optimizer package.
 
 import asyncio
 import os
+
+from dotenv import load_dotenv
+
 from prompt_optimizer import PromptOptimizer
+
+load_dotenv()
 
 
 async def main():
@@ -29,7 +33,7 @@ async def main():
     """
 
     # Target Anthropic model
-    target_model = "anthropic/claude-3.5-sonnet"
+    target_model = "anthropic/claude-3.7-sonnet"
 
     try:
         print("Optimizing prompt for Anthropic Claude-3.5-Sonnet...")

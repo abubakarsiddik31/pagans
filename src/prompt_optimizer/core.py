@@ -9,35 +9,34 @@ appropriate optimization prompts.
 import asyncio
 import os
 import time
-from typing import Optional, Dict
 
+from .client import OpenRouterClient
+from .constants import (
+    DEFAULT_BASE_URL,
+    DEFAULT_MAX_RETRIES,
+    DEFAULT_OPTIMIZER_MODEL,
+    DEFAULT_RETRY_DELAY,
+    DEFAULT_TIMEOUT,
+    ENV_DEFAULT_OPTIMIZER_MODEL,
+    ENV_OPENROUTER_API_KEY,
+    ENV_OPENROUTER_BASE_URL,
+)
+from .exceptions import (
+    ConfigurationError,
+    ModelNotFoundError,
+    OpenRouterAPIError,
+    PromptOptimizerError,
+)
 from .models import (
     ModelFamily,
     OptimizationResult,
     detect_model_family,
-    is_supported_model,
     get_supported_models,
+    is_supported_model,
 )
-from .client import OpenRouterClient
 from .optimizer_prompts import (
-    get_optimization_prompt,
     get_optimization_description,
-)
-from .constants import (
-    DEFAULT_OPTIMIZER_MODEL,
-    DEFAULT_BASE_URL,
-    DEFAULT_TIMEOUT,
-    DEFAULT_MAX_RETRIES,
-    DEFAULT_RETRY_DELAY,
-    ENV_OPENROUTER_API_KEY,
-    ENV_OPENROUTER_BASE_URL,
-    ENV_DEFAULT_OPTIMIZER_MODEL,
-)
-from .exceptions import (
-    PromptOptimizerError,
-    ModelNotFoundError,
-    ConfigurationError,
-    OpenRouterAPIError,
+    get_optimization_prompt,
 )
 
 
@@ -51,9 +50,9 @@ class PromptOptimizer:
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
-        base_url: Optional[str] = None,
-        default_model: Optional[str] = None,
+        api_key: str | None = None,
+        base_url: str | None = None,
+        default_model: str | None = None,
         timeout: float = DEFAULT_TIMEOUT,
         max_retries: int = DEFAULT_MAX_RETRIES,
         retry_delay: float = DEFAULT_RETRY_DELAY,
@@ -76,7 +75,9 @@ class PromptOptimizer:
                 f"API key is required. Set {ENV_OPENROUTER_API_KEY} environment variable or pass api_key parameter."
             )
 
-        self.base_url = base_url or os.getenv(ENV_OPENROUTER_BASE_URL, DEFAULT_BASE_URL)
+        self.base_url = (
+            base_url or os.getenv(ENV_OPENROUTER_BASE_URL) or DEFAULT_BASE_URL
+        )
         self.default_model = default_model or os.getenv(
             ENV_DEFAULT_OPTIMIZER_MODEL, DEFAULT_OPTIMIZER_MODEL
         )
@@ -89,13 +90,13 @@ class PromptOptimizer:
             retry_delay=retry_delay,
         )
 
-        self._optimization_cache: Dict[str, OptimizationResult] = {}
+        self._optimization_cache: dict[str, OptimizationResult] = {}
 
     async def optimize(
         self,
         prompt: str,
-        target_model: Optional[str] = None,
-        optimization_notes: Optional[str] = None,
+        target_model: str | None = None,
+        optimization_notes: str | None = None,
         use_cache: bool = True,
     ) -> OptimizationResult:
         """
@@ -114,7 +115,8 @@ class PromptOptimizer:
             Various exceptions based on error type
         """
         if not prompt or not prompt.strip():
-            raise ValueError("Prompt cannot be empty")
+            msg = "Prompt cannot be empty"
+            raise ValueError(msg)
 
         target_model = target_model or self.default_model
 
@@ -130,7 +132,6 @@ class PromptOptimizer:
             family = detect_model_family(target_model)
         except ValueError as e:
             raise ModelNotFoundError(str(e))
-
         try:
             system_prompt = get_optimization_prompt(
                 family.value,
@@ -138,17 +139,15 @@ class PromptOptimizer:
                 target_model,
             )
         except ValueError as e:
-            raise PromptOptimizerError(f"Failed to get optimization prompt: {str(e)}")
-
+            msg = f"Failed to get optimization prompt: {e!s}"
+            raise PromptOptimizerError(msg)
         start_time = time.time()
-
         try:
             optimized_prompt = await self.client.optimize_prompt(
                 prompt=prompt,
                 model=target_model,
                 system_prompt=system_prompt,
             )
-
             optimization_time = time.time() - start_time
 
             result = OptimizationResult(
@@ -166,13 +165,14 @@ class PromptOptimizer:
             return result
 
         except OpenRouterAPIError as e:
-            raise PromptOptimizerError(f"Failed to optimize prompt: {str(e)}")
+            msg = f"Failed to optimize prompt: {e!s}"
+            raise PromptOptimizerError(msg)
 
     async def optimize_multiple(
         self,
         prompts: list[str],
-        target_model: Optional[str] = None,
-        optimization_notes: Optional[str] = None,
+        target_model: str | None = None,
+        optimization_notes: str | None = None,
         use_cache: bool = True,
         max_concurrent: int = 3,
     ) -> list[OptimizationResult]:
@@ -210,9 +210,9 @@ class PromptOptimizer:
         self,
         prompt: str,
         target_models: list[str],
-        optimization_notes: Optional[str] = None,
+        optimization_notes: str | None = None,
         use_cache: bool = True,
-    ) -> Dict[str, OptimizationResult]:
+    ) -> dict[str, OptimizationResult]:
         """
         Compare optimizations across different target models.
 
@@ -244,12 +244,12 @@ class PromptOptimizer:
                 results[model] = result
             except Exception as e:
                 results[model] = PromptOptimizerError(
-                    f"Failed to optimize for {model}: {str(e)}"
+                    f"Failed to optimize for {model}: {e!s}"
                 )
 
         return results
 
-    def get_supported_models(self) -> Dict[ModelFamily, list[str]]:
+    def get_supported_models(self) -> dict[ModelFamily, list[str]]:
         """Get all supported models organized by family."""
         return get_supported_models()
 

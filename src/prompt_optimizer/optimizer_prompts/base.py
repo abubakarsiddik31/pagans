@@ -5,7 +5,6 @@ This module provides the foundation for family-specific optimization prompts.
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict
 
 
 class BaseOptimizationPrompt(ABC):
@@ -23,7 +22,6 @@ class BaseOptimizationPrompt(ABC):
         Returns:
             The optimization prompt template with variables filled
         """
-        pass
 
     @abstractmethod
     def get_description(self) -> str:
@@ -33,14 +31,13 @@ class BaseOptimizationPrompt(ABC):
         Returns:
             Description of the optimization strategy
         """
-        pass
 
 
 class OptimizationPromptManager:
     """Manager for optimization prompts across different model families."""
 
     def __init__(self):
-        self._prompts: Dict[str, BaseOptimizationPrompt] = {}
+        self._prompts: dict[str, BaseOptimizationPrompt] = {}
 
     def register_prompt(self, family: str, prompt: BaseOptimizationPrompt) -> None:
         """Register an optimization prompt for a model family."""

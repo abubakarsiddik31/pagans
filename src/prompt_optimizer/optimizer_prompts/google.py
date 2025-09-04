@@ -5,8 +5,6 @@ This module contains detailed, research-specific optimization prompts
 for Google's Gemini models based on official documentation and best practices.
 """
 
-from typing import Dict, Any
-
 from .base import BaseOptimizationPrompt
 
 

@@ -7,9 +7,8 @@ and data structures for optimization requests and results.
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, List, Optional
 
-from src.prompt_optimizer.constants import (
+from prompt_optimizer.constants import (
     FAMILY_ANTHROPIC,
     FAMILY_GOOGLE,
     FAMILY_OPENAI,
@@ -32,9 +31,9 @@ class OptimizationResult:
     optimized: str  # Optimized prompt
     target_model: str  # Target model name
     target_family: ModelFamily  # Model family
-    optimization_notes: Optional[str] = None  # Optimization notes
-    tokens_used: Optional[int] = None  # Tokens used in optimization
-    optimization_time: Optional[float] = None  # Time taken in seconds
+    optimization_notes: str | None = None  # Optimization notes
+    tokens_used: int | None = None  # Tokens used in optimization
+    optimization_time: float | None = None  # Time taken in seconds
 
 
 @dataclass
@@ -43,10 +42,10 @@ class OptimizationRequest:
 
     prompt: str  # Original prompt
     target_model: str  # Target model name
-    optimization_notes: Optional[str] = None  # Optimization notes
+    optimization_notes: str | None = None  # Optimization notes
 
 
-MODEL_MAPPINGS: Dict[ModelFamily, List[str]] = {
+MODEL_MAPPINGS: dict[ModelFamily, list[str]] = {
     ModelFamily.OPENAI: [
         "gpt-5",
         "gpt-4.1",
@@ -63,12 +62,12 @@ MODEL_MAPPINGS: Dict[ModelFamily, List[str]] = {
     ],
 }
 
-MODEL_NAME_MAPPINGS: Dict[str, ModelFamily] = {}
+MODEL_NAME_MAPPINGS: dict[str, ModelFamily] = {}
 for family, models in MODEL_MAPPINGS.items():
     for model in models:
         MODEL_NAME_MAPPINGS[model] = family
 
-FAMILY_MODEL_MAPPINGS: Dict[str, List[str]] = {
+FAMILY_MODEL_MAPPINGS: dict[str, list[str]] = {
     family.value: models for family, models in MODEL_MAPPINGS.items()
 }
 
@@ -98,10 +97,11 @@ def detect_model_family(model_name: str) -> ModelFamily:
             if model_name in model.lower() or model.lower() in model_name:
                 return family
 
-    raise ValueError(f"Unknown model family for: {model_name}")
+    msg = f"Unknown model family for: {model_name}"
+    raise ValueError(msg)
 
 
-def get_supported_models() -> Dict[ModelFamily, List[str]]:
+def get_supported_models() -> dict[ModelFamily, list[str]]:
     """
     Get all supported models organized by family.
 
@@ -128,7 +128,7 @@ def is_supported_model(model_name: str) -> bool:
         return False
 
 
-def get_model_family_models(family: ModelFamily) -> List[str]:
+def get_model_family_models(family: ModelFamily) -> list[str]:
     """
     Get all models for a specific family.
 
@@ -141,7 +141,7 @@ def get_model_family_models(family: ModelFamily) -> List[str]:
     return MODEL_MAPPINGS.get(family, [])
 
 
-def get_family_models(family_name: str) -> List[str]:
+def get_family_models(family_name: str) -> list[str]:
     """
     Get all models for a family by name.
 

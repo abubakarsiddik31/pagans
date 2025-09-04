@@ -8,7 +8,10 @@ using the Prompt Optimizer package.
 
 import asyncio
 import os
+from dotenv import load_dotenv
 from prompt_optimizer import PromptOptimizer
+
+load_dotenv()
 
 
 async def main():

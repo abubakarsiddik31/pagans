@@ -8,7 +8,10 @@ using the Prompt Optimizer package.
 
 import asyncio
 import os
+from dotenv import load_dotenv
 from prompt_optimizer import PromptOptimizer
+
+load_dotenv()
 
 
 async def main():
@@ -20,22 +23,14 @@ async def main():
         print("Please set OPENROUTER_API_KEY environment variable")
         return
 
-    # Create optimizer instance
     optimizer = PromptOptimizer(api_key=api_key)
 
-    # Example prompt to optimize
     original_prompt = """
     Write a Python function that calculates the factorial of a number.
     """
 
-    # Target OpenAI model
     target_model = "openai/gpt-4o"
-
     try:
-        print("Optimizing prompt for OpenAI GPT-4o...")
-        print(f"Original prompt: {original_prompt.strip()}")
-
-        # Optimize the prompt
         result = await optimizer.optimize(
             prompt=original_prompt,
             target_model=target_model,

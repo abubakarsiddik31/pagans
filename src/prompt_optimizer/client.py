@@ -7,26 +7,27 @@ with proper error handling, rate limiting, and retry logic.
 
 import asyncio
 import time
-from typing import Dict, Any, Optional
+from typing import Any
+
 import httpx
 
 from .constants import (
-    DEFAULT_BASE_URL,
-    DEFAULT_TIMEOUT,
-    DEFAULT_MAX_RETRIES,
-    DEFAULT_RETRY_DELAY,
     API_VERSION,
     CHAT_COMPLETIONS_ENDPOINT,
+    DEFAULT_BASE_URL,
     DEFAULT_HEADERS,
+    DEFAULT_MAX_RETRIES,
+    DEFAULT_RETRY_DELAY,
+    DEFAULT_TIMEOUT,
 )
 from .exceptions import (
-    OpenRouterAPIError,
-    NetworkError,
-    TimeoutError,
-    RateLimitError,
     AuthenticationError,
-    QuotaExceededError,
     ModelNotFoundError,
+    NetworkError,
+    OpenRouterAPIError,
+    QuotaExceededError,
+    RateLimitError,
+    TimeoutError,
 )
 
 
@@ -83,9 +84,9 @@ class OpenRouterClient:
         self,
         method: str,
         endpoint: str,
-        data: Optional[Dict[str, Any]] = None,
-        params: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        data: dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """
         Make an HTTP request with retry logic and error handling.
 
@@ -120,30 +121,28 @@ class OpenRouterClient:
                     return response.json()
 
                 if response.status_code == 401:
-                    raise AuthenticationError("Invalid API key")
-                elif response.status_code == 403:
+                    msg = "Invalid API key"
+                    raise AuthenticationError(msg)
+                if response.status_code == 403:
                     raise AuthenticationError("Access forbidden")
-                elif response.status_code == 404:
+                if response.status_code == 404:
                     error_data = response.json()
                     raise ModelNotFoundError(
                         error_data.get("error", {}).get("message", "Model not found")
                     )
-                elif response.status_code == 429:
+                if response.status_code == 429:
                     retry_after = self._parse_retry_after(response)
                     raise RateLimitError(retry_after=retry_after)
-                elif response.status_code == 429:
+                if response.status_code == 429:
                     raise QuotaExceededError("API quota exceeded")
-                elif response.status_code >= 500:
+                if response.status_code >= 500:
                     raise NetworkError(f"Server error: {response.status_code}")
-                else:
-                    error_data = response.json()
-                    raise OpenRouterAPIError(
-                        message=error_data.get("error", {}).get(
-                            "message", "Unknown error"
-                        ),
-                        status_code=response.status_code,
-                        response_data=error_data,
-                    )
+                error_data = response.json()
+                raise OpenRouterAPIError(
+                    message=error_data.get("error", {}).get("message", "Unknown error"),
+                    status_code=response.status_code,
+                    response_data=error_data,
+                )
 
             except httpx.TimeoutException:
                 if attempt == self.max_retries:
@@ -152,7 +151,7 @@ class OpenRouterClient:
 
             except httpx.NetworkError as e:
                 if attempt == self.max_retries:
-                    raise NetworkError(f"Network error: {str(e)}")
+                    raise NetworkError(f"Network error: {e!s}")
                 await asyncio.sleep(self.retry_delay)
 
             except (
@@ -162,8 +161,9 @@ class OpenRouterClient:
                 QuotaExceededError,
             ):
                 raise
+        return None
 
-    def _parse_retry_after(self, response: httpx.Response) -> Optional[int]:
+    def _parse_retry_after(self, response: httpx.Response) -> int | None:
         """Parse Retry-After header from response."""
         retry_after = response.headers.get("Retry-After")
         if retry_after:
@@ -238,7 +238,7 @@ class OpenRouterClient:
 
         return choice["message"]["content"].strip()
 
-    async def get_models(self) -> Dict[str, Any]:
+    async def get_models(self) -> dict[str, Any]:
         """
         Get available models from OpenRouter API.
 

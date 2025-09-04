@@ -28,7 +28,7 @@ pip install prompt-optimizer
 ### From Source
 
 ```bash
-git clone https://github.com/yourusername/prompt-optimizer.git
+git clone https://github.com/abubakarsiddik31/prompt-optimizer.git
 cd prompt-optimizer
 pip install .
 ```
@@ -36,7 +36,7 @@ pip install .
 ### Development Installation
 
 ```bash
-git clone https://github.com/yourusername/prompt-optimizer.git
+git clone https://github.com/abubakarsiddik31/prompt-optimizer.git
 cd prompt-optimizer
 pip install -e ".[dev]"
 ```

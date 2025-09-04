@@ -11,7 +11,7 @@ ENV_OPENROUTER_BASE_URL = "OPENROUTER_BASE_URL"
 ENV_DEFAULT_OPTIMIZER_MODEL = "DEFAULT_OPTIMIZER_MODEL"
 
 # Default configuration values
-DEFAULT_OPTIMIZER_MODEL = "anthropic/claude-3.5-sonnet"
+DEFAULT_OPTIMIZER_MODEL = "openai/gpt-4o-mini"
 DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
 DEFAULT_TIMEOUT = 30.0  # seconds
 DEFAULT_MAX_RETRIES = 3
@@ -19,7 +19,7 @@ DEFAULT_RETRY_DELAY = 1.0  # seconds
 
 # API configuration
 API_VERSION = "v1"
-CHAT_COMPLETIONS_ENDPOINT = f"/{API_VERSION}/chat/completions"
+CHAT_COMPLETIONS_ENDPOINT = "/chat/completions"
 
 # HTTP headers
 DEFAULT_HEADERS = {
