@@ -1,11 +1,12 @@
-# Prompt Optimizer
+# PAGANS - Prompts Aligned to Guidelines and Normalization System 😅
 
-[![PyPI version](https://badge.fury.io/py/prompt-optimizer.svg)](https://pypi.org/project/prompt-optimizer/)
+[![PyPI version](https://badge.fury.io/py/pagans.svg)](https://pypi.org/project/pagans/)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Documentation Status](https://readthedocs.org/projects/prompt-optimizer/badge/?version=latest)](https://prompt-optimizer.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/pagans/badge/?version=latest)](https://pagans.readthedocs.io/en/latest/?badge=latest)
+[![CI](https://github.com/abubakarsiddik31/pagans/actions/workflows/ci.yml/badge.svg)](https://github.com/abubakarsiddik31/pagans/actions/workflows/ci.yml)
 
-A Python package for optimizing prompts across different LLM model families using OpenRouter API. This tool helps developers improve their prompts for specific model architectures by leveraging family-specific optimization techniques.
+A comprehensive Python package for optimizing prompts across different LLM model families using OpenRouter API. PAGANS helps developers align their prompts with model-specific guidelines and normalization standards, ensuring optimal performance across OpenAI GPT, Anthropic Claude, and Google Gemini models.
 
 ## ✨ Features
 
@@ -22,22 +23,22 @@ A Python package for optimizing prompts across different LLM model families usin
 ### From PyPI (Recommended)
 
 ```bash
-pip install prompt-optimizer
+pip install pagans
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/abubakarsiddik31/prompt-optimizer.git
-cd prompt-optimizer
+git clone https://github.com/abubakarsiddik31/pagans.git
+cd pagans
 pip install .
 ```
 
 ### Development Installation
 
 ```bash
-git clone https://github.com/abubakarsiddik31/prompt-optimizer.git
-cd prompt-optimizer
+git clone https://github.com/abubakarsiddik31/pagans.git
+cd pagans
 pip install -e ".[dev]"
 ```
 
@@ -47,7 +48,7 @@ pip install -e ".[dev]"
 
 ```python
 import asyncio
-from prompt_optimizer import PromptOptimizer
+from pagans import PromptOptimizer
 
 async def main():
     # Initialize optimizer with your OpenRouter API key
@@ -80,7 +81,7 @@ export OPENROUTER_API_KEY="your-api-key-here"
 
 ```python
 import asyncio
-from prompt_optimizer import PromptOptimizer
+from pagans import PromptOptimizer
 
 async def main():
     # API key will be loaded from environment variable
@@ -101,7 +102,7 @@ asyncio.run(main())
 
 ```python
 import asyncio
-from prompt_optimizer import PromptOptimizer
+from pagans import PromptOptimizer
 
 async def main():
     async with PromptOptimizer() as optimizer:
@@ -148,7 +149,7 @@ python examples/google_example.py
 
 ```python
 import asyncio
-from prompt_optimizer import PromptOptimizer
+from pagans import PromptOptimizer
 
 async def batch_optimize():
     prompts = [
@@ -172,7 +173,7 @@ async def batch_optimize():
 
 ```python
 import asyncio
-from prompt_optimizer import PromptOptimizer
+from pagans import PromptOptimizer
 
 async def compare_models():
     prompt = "Write a function to reverse a string"
@@ -195,7 +196,7 @@ async def compare_models():
 
 ```python
 import asyncio
-from prompt_optimizer import PromptOptimizer
+from pagans import PromptOptimizer
 
 async def custom_config():
     optimizer = PromptOptimizer(
@@ -295,7 +296,7 @@ pytest
 Run with coverage:
 
 ```bash
-pytest --cov=prompt_optimizer --cov-report=html
+pytest --cov=pagans --cov-report=html
 ```
 
 ## 🤝 Contributing

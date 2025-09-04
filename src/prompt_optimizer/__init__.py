@@ -1,8 +1,9 @@
 """
-Prompt Optimizer - A Python package for optimizing prompts across different LLM model families.
+PAGANS - Prompts Aligned to Guidelines and Normalization System 😅
 
-This package provides tools to optimize prompts for various model families including
-OpenAI, Anthropic, Google, Meta, and Mistral models using the OpenRouter API.
+A comprehensive Python package for optimizing prompts across different LLM model families.
+PAGANS provides tools to align your prompts with model-specific guidelines and normalization
+standards for OpenAI, Anthropic, Google, Meta, and Mistral models using the OpenRouter API.
 """
 
 from .client import OpenRouterClient
@@ -34,10 +35,10 @@ from .optimizer_prompts import (
 )
 
 __version__ = "0.1.0"
-__author__ = "Prompt Optimizer Team"
-__email__ = "contact@promptoptimizer.com"
+__author__ = "PAGANS Team"
+__email__ = "contact@pagans.dev"
 __description__ = (
-    "A Python package for optimizing prompts across different LLM model families"
+    "Prompts Aligned to Guidelines and Normalization System - Optimize prompts across LLM model families"
 )
 
 # Main exports
@@ -77,7 +78,7 @@ def create_optimizer(
     default_model: str = None,
 ) -> PromptOptimizer:
     """
-    Create a PromptOptimizer instance with the given configuration.
+    Create a PAGANS PromptOptimizer instance with the given configuration.
 
     Args:
         api_key: OpenRouter API key (if None, tries to get from environment)
@@ -100,9 +101,9 @@ def create_optimizer(
 # Quick start example
 def quick_start_example():
     """
-    Example usage of the PromptOptimizer.
+    Example usage of PAGANS PromptOptimizer.
 
-    This function demonstrates how to use the PromptOptimizer to optimize a prompt.
+    This function demonstrates how to use PAGANS to optimize a prompt for better LLM performance.
     """
     import asyncio
 

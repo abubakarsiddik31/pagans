@@ -1,7 +1,7 @@
 [project]
-name = "prompt-rocket"
+name = "pagans"
 version = "0.1.0"
-description = "🚀 Blazingly fast prompt optimization for OpenAI, Anthropic, and Google models"
+description = "😅 Prompts Aligned to Guidelines and Normalization System - Optimize prompts for OpenAI, Anthropic, and Google models"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.12"
@@ -21,10 +21,10 @@ keywords = [
     "artificial-intelligence"
 ]
 authors = [
-    {name = "Prompt Optimizer Team", email = "contact@promptoptimizer.com"}
+    {name = "PAGANS Team", email = "contact@pagans.dev"}
 ]
 maintainers = [
-    {name = "Prompt Optimizer Team", email = "contact@promptoptimizer.com"}
+    {name = "PAGANS Team", email = "contact@pagans.dev"}
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -44,11 +44,11 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/abubakarsiddik31/prompt-optimizer"
-Documentation = "https://prompt-optimizer.readthedocs.io/"
-Repository = "https://github.com/abubakarsiddik31/prompt-optimizer"
-Issues = "https://github.com/abubakarsiddik31/prompt-optimizer/issues"
-Changelog = "https://github.com/abubakarsiddik31/prompt-optimizer/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/abubakarsiddik31/pagans"
+Documentation = "https://pagans.readthedocs.io/"
+Repository = "https://github.com/abubakarsiddik31/pagans"
+Issues = "https://github.com/abubakarsiddik31/pagans/issues"
+Changelog = "https://github.com/abubakarsiddik31/pagans/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
