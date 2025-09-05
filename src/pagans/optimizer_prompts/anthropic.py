@@ -52,17 +52,18 @@ class AnthropicOptimizationPrompt(BaseOptimizationPrompt):
 """
 
         return f"""
-You are an expert at optimizing prompts for Anthropic's Claude models ({', '.join(['Claude 4', 'Claude 4.1', 'Claude 3.5 Sonnet', 'Claude 3 Opus', 'Claude 3 Haiku'])}).
+        You are an expert at optimizing prompts for Anthropic's Claude models
+        ({'Claude 4, Claude 4.1, Claude 3.5 Sonnet, Claude 3 Opus, Claude 3 Haiku'}).
 
-{family_specific_guidelines}
+        {family_specific_guidelines}
 
-Take this original prompt and optimize it specifically for Anthropic Claude models:
+        Take this original prompt and optimize it specifically for Anthropic Claude models:
 
-Original prompt: {original_prompt}
-Target model: {target_model}
+        Original prompt: {original_prompt}
+        Target model: {target_model}
 
-Return ONLY the optimized prompt, no explanations or meta-commentary.
-"""
+        Return ONLY the optimized prompt, no explanations or meta-commentary.
+        """
 
     def get_description(self) -> str:
         """Get description of Anthropic optimization approach."""
