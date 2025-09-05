@@ -8,7 +8,7 @@ and data structures for optimization requests and results.
 from dataclasses import dataclass
 from enum import Enum
 
-from pagans.constants import (
+from .constants import (
     FAMILY_ANTHROPIC,
     FAMILY_GOOGLE,
     FAMILY_OPENAI,

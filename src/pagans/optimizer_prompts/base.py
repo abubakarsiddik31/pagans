@@ -1,16 +1,49 @@
 """
 Base optimization prompt template and utilities.
 
-This module provides the foundation for family-specific optimization prompts.
+This module provides the foundation for family-specific optimization prompts
+using Jinja2 templating for centralized prompt management.
 """
 
+import os
 from abc import ABC, abstractmethod
+from pathlib import Path
+
+from jinja2 import Environment, FileSystemLoader, Template
+
+
+class TemplateManager:
+    """Manages Jinja2 templates for prompt optimization."""
+
+    def __init__(self):
+        template_dir = Path(__file__).parent / "templates"
+        self.env = Environment(
+            loader=FileSystemLoader(template_dir),
+            trim_blocks=True,
+            lstrip_blocks=True,
+        )
+
+    def get_template(self, template_name: str) -> Template:
+        """Get a Jinja template by name."""
+        return self.env.get_template(f"{template_name}.jinja")
+
+    def render_template(self, template_name: str, **kwargs) -> str:
+        """Render a template with the given context variables."""
+        template = self.get_template(template_name)
+        return template.render(**kwargs)
+
+
+# Global template manager instance
+_template_manager = TemplateManager()
 
 
 class BaseOptimizationPrompt(ABC):
-    """Abstract base class for optimization prompts."""
+    """Abstract base class for optimization prompts using Jinja templates."""
 
-    @abstractmethod
+    def __init__(self, template_name: str):
+        self.template_name = template_name
+        self.template_manager = _template_manager
+
     def get_prompt(self, original_prompt: str, target_model: str) -> str:
         """
         Get the optimization prompt for a specific model family.
@@ -20,8 +53,18 @@ class BaseOptimizationPrompt(ABC):
             target_model: The target model name
 
         Returns:
-            The optimization prompt template with variables filled
+            The optimization prompt rendered from Jinja template
         """
+        return self.template_manager.render_template(
+            self.template_name,
+            original_prompt=original_prompt,
+            target_model=target_model,
+            model_family=self.get_model_family(),
+        )
+
+    @abstractmethod
+    def get_model_family(self) -> str:
+        """Get the model family name for this optimization prompt."""
 
     @abstractmethod
     def get_description(self) -> str:
@@ -60,17 +103,3 @@ class OptimizationPromptManager:
     def get_supported_families(self) -> list:
         """Get list of supported model families."""
         return list(self._prompts.keys())
-
-
-BASE_OPTIMIZATION_TEMPLATE = """
-You are an expert at optimizing prompts for {model_family} models.
-
-{family_specific_guidelines}
-
-Take this original prompt and optimize it specifically for {model_family} models:
-
-Original prompt: {original_prompt}
-Target model: {target_model}
-
-Return ONLY the optimized prompt, no explanations or meta-commentary.
-"""

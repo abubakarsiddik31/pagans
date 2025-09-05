@@ -163,7 +163,7 @@ class TestFamilySpecificPrompts:
             original_prompt="Test prompt", target_model="gpt-4o"
         )
 
-        assert "OpenAI's GPT models" in prompt
+        assert "OpenAI GPT models" in prompt
         assert "gpt-4o" in prompt
         assert "Test prompt" in prompt
         assert "Return ONLY the optimized prompt" in prompt
@@ -174,7 +174,7 @@ class TestFamilySpecificPrompts:
             original_prompt="Test prompt", target_model="claude-3.5-sonnet"
         )
 
-        assert "Anthropic's Claude models" in prompt
+        assert "Anthropic Claude models" in prompt
         assert "claude-3.5-sonnet" in prompt
         assert "Test prompt" in prompt
         assert "Return ONLY the optimized prompt" in prompt
@@ -185,7 +185,7 @@ class TestFamilySpecificPrompts:
             original_prompt="Test prompt", target_model="gemini-1.5-pro"
         )
 
-        assert "Google's Gemini models" in prompt
+        assert "Google Gemini models" in prompt
         assert "gemini-1.5-pro" in prompt
         assert "Test prompt" in prompt
         assert "Return ONLY the optimized prompt" in prompt
@@ -224,7 +224,7 @@ class TestGlobalPromptFunctions:
 
         assert isinstance(result, str)
         assert len(result) > 0
-        assert "OpenAI's GPT models" in result
+        assert "OpenAI GPT models" in result
         assert "Test prompt" in result
         assert "gpt-4o" in result
 
