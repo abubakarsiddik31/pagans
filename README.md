@@ -8,7 +8,10 @@
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Documentation Status](https://readthedocs.org/projects/pagans/badge/?version=latest)](https://pagans.readthedocs.io/en/latest/?badge=latest)
-[![CI](https://github.com/abubakarsiddik31/pagans/actions/workflows/ci.yml/badge.svg)](https://github.com/abubakarsiddik31/pagans/actions/workflows/ci.yml)
+[![Build](https://github.com/abubakarsiddik31/pagans/actions/workflows/build.yml/badge.svg)](https://github.com/abubakarsiddik31/pagans/actions/workflows/build.yml)
+[![Test](https://github.com/abubakarsiddik31/pagans/actions/workflows/test.yml/badge.svg)](https://github.com/abubakarsiddik31/pagans/actions/workflows/test.yml)
+[![Lint](https://github.com/abubakarsiddik31/pagans/actions/workflows/lint.yml/badge.svg)](https://github.com/abubakarsiddik31/pagans/actions/workflows/lint.yml)
+
 
 A comprehensive Python package for optimizing prompts across different LLM model families using OpenRouter API. PAGANS helps developers align their prompts with model-specific guidelines and normalization standards, ensuring optimal performance across OpenAI GPT, Anthropic Claude, and Google Gemini models.
 
