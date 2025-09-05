@@ -131,10 +131,13 @@ class OpenRouterClient:
                         error_data.get("error", {}).get("message", "Model not found")
                     )
                 if response.status_code == 429:
-                    retry_after = self._parse_retry_after(response)
-                    raise RateLimitError(retry_after=retry_after)
-                if response.status_code == 429:
-                    raise QuotaExceededError("API quota exceeded")
+                    error_data = response.json()
+                    error_message = error_data.get("error", {}).get("message", "").lower()
+                    if "quota" in error_message:
+                        raise QuotaExceededError("API quota exceeded")
+                    else:
+                        retry_after = self._parse_retry_after(response)
+                        raise RateLimitError(retry_after=retry_after)
                 if response.status_code >= 500:
                     raise NetworkError(f"Server error: {response.status_code}")
                 error_data = response.json()
@@ -172,7 +175,8 @@ class OpenRouterClient:
             except ValueError:
                 try:
                     retry_time = time.strptime(retry_after, "%a, %d %b %Y %H:%M:%S GMT")
-                    return int(retry_time - time.time())
+                    retry_timestamp = time.mktime(retry_time)
+                    return int(retry_timestamp - time.time())
                 except ValueError:
                     pass
         return None

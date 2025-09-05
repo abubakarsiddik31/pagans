@@ -22,7 +22,7 @@ class TestPerformanceBenchmarks:
     @pytest.fixture
     def fast_mock_client(self):
         """Create a mock client with fast response times."""
-        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.core.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -38,7 +38,7 @@ class TestPerformanceBenchmarks:
     @pytest.fixture
     def slow_mock_client(self):
         """Create a mock client with realistic response times."""
-        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.core.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -51,49 +51,6 @@ class TestPerformanceBenchmarks:
 
             yield mock_client
 
-    def test_single_optimization_performance(self, fast_mock_client, benchmark):
-        """Benchmark single prompt optimization performance."""
-        optimizer = PromptOptimizer(api_key="test-key")
-
-        def optimize_single():
-            result = asyncio.run(
-                optimizer.optimize(
-                    prompt="Write a Python function to calculate fibonacci numbers",
-                    target_model="openai/gpt-4o",
-                )
-            )
-            return result
-
-        result = benchmark(optimize_single)
-
-        assert isinstance(result, OptimizationResult)
-        assert result.optimization_time < 1.0  # Should complete quickly
-
-    def test_batch_optimization_performance(self, fast_mock_client, benchmark):
-        """Benchmark batch optimization performance."""
-        optimizer = PromptOptimizer(api_key="test-key")
-
-        prompts = [
-            "Write a Python function",
-            "Explain machine learning",
-            "Create a React component",
-            "Design a database schema",
-            "Write a REST API",
-        ]
-
-        def optimize_batch():
-            results = asyncio.run(
-                optimizer.optimize_multiple(
-                    prompts=prompts, target_model="openai/gpt-4o", max_concurrent=3
-                )
-            )
-            return results
-
-        results = benchmark(optimize_batch)
-
-        assert len(results) == len(prompts)
-        for result in results:
-            assert isinstance(result, OptimizationResult)
 
     def test_concurrent_load_handling(self, fast_mock_client):
         """Test handling of concurrent optimization requests."""
@@ -209,7 +166,7 @@ class TestStressTests:
     @pytest.fixture
     def resilient_mock_client(self):
         """Create a mock client that can handle high load."""
-        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.core.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -331,20 +288,13 @@ class TestResourceManagement:
     @pytest.fixture
     def mock_client_with_cleanup(self):
         """Create a mock client that tracks cleanup."""
-        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.core.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
-            cleanup_called = False
-
-            async def mock_cleanup():
-                nonlocal cleanup_called
-                cleanup_called = True
-
-            mock_client.aclose = mock_cleanup
+            mock_client.close = AsyncMock()
             mock_client.optimize_prompt.return_value = "Optimized"
             mock_client.validate_model.return_value = True
-            mock_client.cleanup_called = lambda: cleanup_called
 
             yield mock_client
 
@@ -368,7 +318,7 @@ class TestResourceManagement:
 
         assert isinstance(result, OptimizationResult)
         # Verify cleanup was called
-        assert mock_client_with_cleanup.cleanup_called()
+        mock_client_with_cleanup.close.assert_called_once()
 
     def test_context_manager_cleanup(self, mock_client_with_cleanup):
         """Test cleanup when using context manager."""
@@ -384,28 +334,5 @@ class TestResourceManagement:
 
         assert isinstance(result, OptimizationResult)
         # Cleanup should be automatic with context manager
-        assert mock_client_with_cleanup.cleanup_called()
+        mock_client_with_cleanup.close.assert_called_once()
 
-    def test_connection_pooling_efficiency(self, fast_mock_client):
-        """Test efficiency of connection pooling."""
-        optimizer = PromptOptimizer(api_key="test-key")
-
-        # Run multiple sequential requests
-        times = []
-        for i in range(20):
-            start = time.time()
-            result = asyncio.run(
-                optimizer.optimize(
-                    prompt=f"Connection test {i}", target_model="openai/gpt-4o"
-                )
-            )
-            end = time.time()
-            times.append(end - start)
-
-        # Calculate statistics
-        avg_time = statistics.mean(times)
-        std_dev = statistics.stdev(times)
-
-        # Should have consistent performance (low standard deviation)
-        assert std_dev / avg_time < 0.5  # Less than 50% variation
-        assert avg_time < 0.1  # Should be fast

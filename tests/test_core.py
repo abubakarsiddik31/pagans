@@ -156,7 +156,8 @@ class TestPromptOptimizerOptimization:
 
     def test_optimize_api_error(self, mock_optimizer):
         """Test optimization with API error raises error."""
-        mock_optimizer.client.optimize_prompt.side_effect = Exception("API Error")
+        from src.pagans.exceptions import OpenRouterAPIError
+        mock_optimizer.client.optimize_prompt.side_effect = OpenRouterAPIError("API Error")
 
         with pytest.raises(PromptOptimizerError, match="Failed to optimize prompt"):
             asyncio.run(
@@ -344,7 +345,7 @@ class TestPromptOptimizerOptimization:
         mock_optimizer.client.close = AsyncMock()
 
         async def test_context():
-            async with PromptOptimizer(api_key="test-api-key") as optimizer:
+            async with mock_optimizer as optimizer:
                 assert optimizer is not None
                 return optimizer
 

@@ -50,15 +50,23 @@ MODEL_MAPPINGS: dict[ModelFamily, list[str]] = {
         "gpt-5",
         "gpt-4.1",
         "gpt-4o",
+
+        "gpt-4o-mini",
+        "openai/gpt-4o",
+        "openai/gpt-4o-mini",
     ],
     ModelFamily.ANTHROPIC: [
         "claude-4",
         "claude-4.1",
         "claude-3.7-sonnet",
+        "claude-3.5-sonnet",
+        "anthropic/claude-3.5-sonnet",
     ],
     ModelFamily.GOOGLE: [
         "gemini-2.5-pro",
         "gemini-2.5-flash",
+        "gemini-1.5-pro",
+        "google/gemini-1.5-pro",
     ],
 }
 

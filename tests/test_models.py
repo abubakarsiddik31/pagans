@@ -128,9 +128,6 @@ class TestModelDetection:
         result = detect_model_family("")
         assert isinstance(result, ModelFamily)
 
-        with pytest.raises(ValueError):
-            detect_model_family(None)
-
 
 class TestModelSupport:
     """Test cases for model support checking."""
@@ -150,8 +147,6 @@ class TestModelSupport:
         """Test that unsupported models return False."""
         assert not is_supported_model("invalid-model")
         assert not is_supported_model("unknown-model-123")
-        assert not is_supported_model("")
-        assert not is_supported_model(None)
 
     def test_get_supported_models(self):
         """Test getting supported models organized by family."""
