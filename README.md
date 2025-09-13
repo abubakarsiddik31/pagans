@@ -38,7 +38,7 @@ pip install pagans
 ```bash
 git clone https://github.com/abubakarsiddik31/pagans.git
 cd pagans
-pip install .
+uv sync
 ```
 
 ### Development Installation
@@ -46,7 +46,7 @@ pip install .
 ```bash
 git clone https://github.com/abubakarsiddik31/pagans.git
 cd pagans
-pip install -e ".[dev]"
+uv sync --dev
 ```
 
 ## 🔧 Quick Start
@@ -64,14 +64,17 @@ async def main():
     # Your original prompt
     prompt = "Write a Python function to calculate fibonacci numbers"
 
-    # Optimize for a specific model
+    # Optimize for a specific model and provider
     result = await optimizer.optimize(
         prompt=prompt,
-        target_model="openai/gpt-4o"
+        target_model="claude-sonnet-4",  # Short model name
+        provider="openrouter"            # Provider selection
     )
 
     print(f"Original: {result.original}")
     print(f"Optimized: {result.optimized}")
+    print(f"Model: {result.target_model}")
+    print(f"Provider: {result.provider.value}")
     print(f"Family: {result.target_family.value}")
     print(f"Time: {result.optimization_time:.2f}s")
 
@@ -80,10 +83,39 @@ async def main():
 asyncio.run(main())
 ```
 
+### How It Works
+
+PAGANS separates the **target model** (what you're optimizing for) from the **optimizer model** (what does the work):
+
+```python
+# The optimizer model (from .env) does the actual optimization work
+# The target model is what you're optimizing FOR
+result = await optimizer.optimize(
+    prompt="Explain quantum computing",
+    target_model="claude-sonnet-4",  # What you're optimizing FOR
+    provider="openrouter"            # How to access the target model
+)
+
+# Same optimization strategy for Claude whether via Anthropic or OpenRouter
+result2 = await optimizer.optimize(
+    prompt="Explain quantum computing", 
+    target_model="claude-sonnet-4",  # Same target
+    provider="anthropic"             # Different provider, same optimization
+)
+```
+
+### Environment Configuration
+
+```bash
+export OPENROUTER_API_KEY="your-api-key-here"
+export OPTIMIZER_MODEL="openai/gpt-4o-mini"  # Model that does the optimization work
+```
+
 ### Using Environment Variables
 
 ```bash
 export OPENROUTER_API_KEY="your-api-key-here"
+export OPTIMIZER_MODEL="anthropic/claude-3.5-sonnet"  # Optional: Model that does optimization work
 ```
 
 ```python
@@ -91,15 +123,17 @@ import asyncio
 from pagans import PromptOptimizer
 
 async def main():
-    # API key will be loaded from environment variable
+    # Configuration loaded from environment variables
     optimizer = PromptOptimizer()
 
     result = await optimizer.optimize(
         prompt="Explain quantum computing",
-        target_model="anthropic/claude-3.5-sonnet"
+        target_model="claude-3.5-sonnet",  # What you're optimizing FOR
+        provider="openrouter"              # How to access target model
     )
 
-    print(result.optimized)
+    print(f"Optimized for: {result.target_model}")
+    print(f"Optimization: {result.optimized}")
     await optimizer.close()
 
 asyncio.run(main())
@@ -122,32 +156,60 @@ async def main():
 
 ## 🎯 Supported Models
 
-| Provider | Models | Status |
-|----------|--------|--------|
-| **OpenAI** | `gpt-5`, `gpt-4.1`, `gpt-4o` | ✅ Fully Supported |
-| **Anthropic** | `claude-4`, `claude-4.1`, `claude-3.5-sonnet` | ✅ Fully Supported |
-| **Google** | `gemini-2.5-pro`, `gemini-2.5-flash` | ✅ Fully Supported |
+### Short Model Names (Recommended)
+Use these convenient short names with any supported provider:
+
+| Family | Short Names | Providers |
+|--------|-------------|-----------|
+| **OpenAI** | `gpt-4o`, `gpt-4o-mini`, `gpt-5` | `openrouter`, `openai` |
+| **Anthropic** | `claude-opus-4`, `claude-opus-4.1`, `claude-sonnet-4`, `claude-sonnet-3.7`, `claude-3.5-sonnet` | `openrouter`, `anthropic` |
+| **Google** | `gemini-2.5-pro`, `gemini-2.5-flash` | `openrouter`, `google` |
+
+### Provider-Specific Model Names
+| Provider | Example Usage |
+|----------|---------------|
+| **OpenRouter** | `anthropic/claude-3.5-sonnet`, `openai/gpt-4o`, `google/gemini-2.5-pro` |
+| **Anthropic** | `claude-3-5-sonnet-20241022`, `claude-sonnet-4-20250514` |
+| **OpenAI** | `gpt-4o`, `gpt-4o-mini` |
+| **Google** | `gemini-2.5-pro`, `gemini-2.5-flash` |
+
+> **✨ Key Feature**: Separate target model (what you optimize FOR) from optimizer model (what does the work). Same optimization strategy regardless of provider!
 
 ## 📚 Examples
 
 See the `examples/` directory for complete working examples:
 
 ### OpenAI GPT Example
-```python
-# examples/openai_example.py
-python examples/openai_example.py
+```bash
+# Set your OpenRouter API key (get one at https://openrouter.ai/)
+export OPENROUTER_API_KEY="your-openrouter-api-key-here"
+
+# Run the example
+uv run examples/openai_example.py
 ```
 
 ### Anthropic Claude Example
-```python
-# examples/anthropic_example.py
-python examples/anthropic_example.py
+```bash
+# Set your OpenRouter API key (get one at https://openrouter.ai/)
+export OPENROUTER_API_KEY="your-openrouter-api-key-here"
+
+# Run the example
+uv run examples/anthropic_example.py
 ```
 
 ### Google Gemini Example
-```python
-# examples/google_example.py
-python examples/google_example.py
+```bash
+# Set your OpenRouter API key (get one at https://openrouter.ai/)
+export OPENROUTER_API_KEY="your-openrouter-api-key-here"
+
+# Run the example
+uv run examples/google_example.py
+```
+
+### Simple Example
+```bash
+# Simple example showing the updated approach
+uv run examples/simple_example.py
 ```
 
 ## 🔧 Advanced Usage
@@ -189,9 +251,9 @@ async def compare_models():
         results = await optimizer.compare_optimizations(
             prompt=prompt,
             target_models=[
-                "openai/gpt-4o",
-                "anthropic/claude-3.5-sonnet",
-                "google/gemini-2.5-pro"
+                ("gpt-4o", "openrouter"),
+                ("claude-3.5-sonnet", "openrouter"), 
+                ("gemini-2.5-pro", "openrouter")
             ]
         )
 
@@ -279,8 +341,8 @@ Optimize multiple prompts concurrently.
 ### Environment Variables
 
 - `OPENROUTER_API_KEY`: Your OpenRouter API key (required)
+- `OPTIMIZER_MODEL`: The model that does the optimization work (optional)
 - `OPENROUTER_BASE_URL`: Custom OpenRouter base URL (optional)
-- `DEFAULT_OPTIMIZER_MODEL`: Default model for optimization (optional)
 
 ### .env File Support
 
@@ -289,22 +351,48 @@ Create a `.env` file in your project root:
 ```env
 OPENROUTER_API_KEY=your-api-key-here
 OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-DEFAULT_OPTIMIZER_MODEL=anthropic/claude-3.5-sonnet
+OPTIMIZER_MODEL=openai/gpt-4o-mini
 ```
 
+**Important Environment Variables:**
+- `OPENROUTER_API_KEY`: Your OpenRouter API key (required)
+- `OPTIMIZER_MODEL`: The model that does the optimization work (optional, defaults to `openai/gpt-4o-mini`)
+- `OPENROUTER_BASE_URL`: Custom OpenRouter base URL (optional)
+
 ## 🧪 Testing
+
+This project uses `uv` for dependency management and running commands.
 
 Run the test suite:
 
 ```bash
-pytest
+uv run pytest
 ```
 
 Run with coverage:
 
 ```bash
-pytest --cov=pagans --cov-report=html
+uv run pytest --cov=pagans --cov-report=html
 ```
+
+## 🚀 What's Coming Next
+
+We're actively working on exciting new features! Here's what's on our roadmap:
+
+### 🔥 **Coming Soon**
+1. **🔑 Multi-Provider API Support** - Direct integration with OpenAI, Anthropic, Google, and Groq APIs (no more OpenRouter dependency!)
+2. **🤖 Extended Model Families** - Support for Meta Llama, Mistral, Cohere, and Perplexity models
+3. **⚡ Advanced Caching** - Redis-based distributed caching with semantic similarity matching
+
+### 🎯 **Planned Features**
+- **🔄 A/B Testing Framework** - Compare optimization strategies and automatically select the best approach
+- **📊 Performance Analytics** - Track optimization success rates, cost savings, and performance metrics  
+- **🛠️ CLI Tool** - Command-line interface for batch processing and automation
+- **🌐 Web Dashboard** - Simple web UI for testing and managing optimizations
+- **🔌 Framework Integrations** - Native support for LangChain, LlamaIndex, and Haystack
+- **📱 IDE Extensions** - VS Code extension for in-editor prompt optimization
+
+Want to contribute to any of these features? Check out our [agents.md](agents.md) for developer guidelines!
 
 ## 🤝 Contributing
 
@@ -315,6 +403,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+For detailed development guidelines, see [agents.md](agents.md).
 
 ## 📝 License
 

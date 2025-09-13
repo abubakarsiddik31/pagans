@@ -21,7 +21,12 @@ async def main():
     # Get API key from environment
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
-        print("Please set OPENROUTER_API_KEY environment variable")
+        print("❌ OPENROUTER_API_KEY environment variable not found!")
+        print("\nTo run this example:")
+        print("1. Get an API key from https://openrouter.ai/")
+        print("2. Set the environment variable:")
+        print("   export OPENROUTER_API_KEY='your-api-key-here'")
+        print("3. Run the example again")
         return
 
     optimizer = PromptOptimizer(api_key=api_key)
@@ -30,15 +35,23 @@ async def main():
     Write a Python function that calculates the factorial of a number.
     """
 
-    target_model = "openai/gpt-4o"
+    # Use short model name and specify provider
+    target_model = "gpt-4o"
+    provider = "openrouter"
+    
     try:
+        print(f"Optimizing prompt for GPT-4o via {provider.upper()}...")
+        print(f"Original prompt: {original_prompt.strip()}")
+        
         result = await optimizer.optimize(
             prompt=original_prompt,
             target_model=target_model,
+            provider=provider,
         )
 
         print("\n✅ Optimization complete!")
         print(f"Target model: {result.target_model}")
+        print(f"Provider: {result.provider.value}")
         print(f"Target family: {result.target_family.value}")
         print(f"Optimization time: {result.optimization_time:.2f}s")
         print(f"\nOptimized prompt:\n{result.optimized}")

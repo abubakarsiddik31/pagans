@@ -8,7 +8,7 @@ and other constants used throughout the package.
 # Environment variable names
 ENV_OPENROUTER_API_KEY = "OPENROUTER_API_KEY"
 ENV_OPENROUTER_BASE_URL = "OPENROUTER_BASE_URL"
-ENV_DEFAULT_OPTIMIZER_MODEL = "DEFAULT_OPTIMIZER_MODEL"
+ENV_OPTIMIZER_MODEL = "OPTIMIZER_MODEL"
 
 # Default configuration values
 DEFAULT_OPTIMIZER_MODEL = "openai/gpt-4o-mini"

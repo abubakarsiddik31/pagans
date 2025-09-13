@@ -20,7 +20,12 @@ async def main():
 
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
-        print("Please set OPENROUTER_API_KEY environment variable")
+        print("❌ OPENROUTER_API_KEY environment variable not found!")
+        print("\nTo run this example:")
+        print("1. Get an API key from https://openrouter.ai/")
+        print("2. Set the environment variable:")
+        print("   export OPENROUTER_API_KEY='your-api-key-here'")
+        print("3. Run the example again")
         return
 
     optimizer = PromptOptimizer(api_key=api_key)

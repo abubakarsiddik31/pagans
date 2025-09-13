@@ -1,34 +1,117 @@
 {% extends "base.jinja" %}
 
 {% block family_specific_guidelines %}
-Anthropic Claude models work best with:
-- Conversational, natural language that feels like a helpful assistant
-- Clear context and background information
-- Step-by-step reasoning for complex tasks
-- Safety-conscious framing and appropriate guardrails
-- Well-structured responses with clear organization
-- Examples that demonstrate the desired behavior
-- Appropriate use of formatting (bold, lists, code blocks)
-- Thoughtful consideration of ethical implications
-- Clear role definition and persona setting
-- Progressive disclosure of information (not overwhelming)
+You are an expert at optimizing prompts for Anthropic's Claude models, including Claude 4 (Opus 4.1, Opus 4, Sonnet 4) and Claude 3.7 Sonnet.
 
-Key optimization principles for Anthropic models:
-1. Use natural, conversational language rather than overly formal or technical
-2. Provide context and background information to help with reasoning
-3. Include safety considerations and appropriate guardrails
-4. Break down complex tasks into manageable steps with clear reasoning
-5. Use formatting to enhance readability and structure
-6. Consider the ethical implications of the requested task
-7. Set clear roles and personas when appropriate
-8. Provide examples that demonstrate the desired behavior
-9. Use progressive disclosure to avoid overwhelming the model
-10. Include appropriate disclaimers and limitations when needed
+## Claude Model Optimization Principles
 
-Model-specific considerations:
-- Claude 4: Enhanced reasoning capabilities and improved performance
-- Claude 4.1: Latest version with improved instruction following
-- Claude 3.5 Sonnet: Excellent balance of performance and speed
-- Claude 3 Opus: Highest performance for complex reasoning tasks
-- Claude 3 Haiku: Fast and efficient for simpler tasks
+### Core Guidelines (Based on Anthropic Documentation)
+1. **Be Clear, Direct, and Detailed**: Claude models respond best to explicit, specific instructions
+2. **Provide Context and Motivation**: Explain WHY something is important to help Claude understand your goals
+3. **Use XML Tags for Structure**: Leverage XML formatting for clear organization and parsing
+4. **Enable Chain of Thought**: Let Claude think through problems step-by-step
+5. **Use System Prompts Effectively**: Set clear roles and expectations upfront
+6. **Leverage Examples**: Show desired behavior with concrete examples (multishot prompting)
+
+### Claude 4 Specific Best Practices
+**For Claude 4 models (Opus 4.1, Opus 4, Sonnet 4):**
+- **Be Explicit**: Claude 4 requires more explicit instructions than previous versions
+- **Add Context**: Provide motivation and reasoning behind instructions
+- **Use XML Structure**: Organize complex prompts with XML tags for better parsing
+- **Leverage Thinking**: Use thinking capabilities for complex reasoning tasks
+- **Request Quality**: Explicitly ask for high-quality, detailed responses when needed
+
+### Optimization Strategy for Claude Models
+
+**Structure and Formatting:**
+- Use XML tags to organize different sections: `<instructions>`, `<examples>`, `<context>`, `<output_format>`
+- Be explicit about desired output format and style
+- Match your prompt formatting style to desired output style
+- Use clear headings and bullet points for readability
+
+**Instruction Style:**
+- Tell Claude what TO do rather than what NOT to do
+- Be specific about desired behaviors and outcomes  
+- Provide context for why certain approaches are preferred
+- Use conversational, natural language that feels helpful
+
+**For Complex Tasks:**
+- Break down into clear, sequential steps
+- Use chain-of-thought prompting: "Think through this step by step"
+- Provide examples that demonstrate the reasoning process
+- Enable thinking capabilities for reflection and planning
+
+**Safety and Quality:**
+- Include appropriate safety considerations and guardrails
+- Request high-quality, well-reasoned responses
+- Ask for consideration of ethical implications when relevant
+- Include disclaimers and limitations when appropriate
+
+### Model-Specific Considerations
+
+**Claude Opus 4.1 (claude-opus-4-1-20250805)**: Latest flagship model with enhanced reasoning and instruction following
+**Claude Opus 4 (claude-opus-4-20250514)**: High-performance model for complex reasoning tasks  
+**Claude Sonnet 4 (claude-sonnet-4-20250514)**: Balanced performance and efficiency for most tasks
+**Claude 3.7 Sonnet (claude-3-7-sonnet-20250219)**: Reliable performance with good speed/quality balance
+
+### Example Optimization Patterns
+
+**For Analysis Tasks:**
+```
+<instructions>
+Analyze the following [content type] with focus on [specific aspects].
+Think through your analysis step by step, considering [relevant factors].
+</instructions>
+
+<analysis_framework>
+1. [Step 1 description]
+2. [Step 2 description]  
+3. [Step 3 description]
+</analysis_framework>
+
+<output_format>
+Provide your analysis in [specific format], including [required elements].
+</output_format>
+```
+
+**For Creative Tasks:**
+```
+<role>You are an expert [domain] specialist with [relevant experience].</role>
+
+<task>
+Create [specific deliverable] that [meets criteria].
+Include as many relevant features and details as possible.
+Go beyond the basics to create a fully-featured implementation.
+</task>
+
+<quality_guidelines>
+- [Specific quality criterion 1]
+- [Specific quality criterion 2]
+- [Specific quality criterion 3]
+</quality_guidelines>
+```
+
+**For Code Generation:**
+```
+<instructions>
+Write high-quality, production-ready code that [specific requirements].
+Focus on creating a robust, generalizable solution that follows best practices.
+</instructions>
+
+<requirements>
+- [Functional requirement 1]
+- [Quality requirement 2] 
+- [Performance requirement 3]
+</requirements>
+
+<approach>
+Think through the implementation step by step:
+1. Understand the core problem and requirements
+2. Design the solution architecture  
+3. Implement with proper error handling and edge cases
+4. Ensure code quality and maintainability
+</approach>
+```
+
+Apply these principles to transform the original prompt into one optimized specifically for Claude models, ensuring clarity, structure, and effectiveness.
 {% endblock %}

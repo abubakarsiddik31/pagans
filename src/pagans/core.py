@@ -17,7 +17,7 @@ from .constants import (
     DEFAULT_OPTIMIZER_MODEL,
     DEFAULT_RETRY_DELAY,
     DEFAULT_TIMEOUT,
-    ENV_DEFAULT_OPTIMIZER_MODEL,
+    ENV_OPTIMIZER_MODEL,
     ENV_OPENROUTER_API_KEY,
     ENV_OPENROUTER_BASE_URL,
 )
@@ -30,9 +30,13 @@ from .exceptions import (
 from .models import (
     ModelFamily,
     OptimizationResult,
+    Provider,
     detect_model_family,
     get_supported_models,
     is_supported_model,
+    resolve_model_and_provider,
+    get_supported_models_by_provider,
+    get_all_supported_providers,
 )
 from .optimizer_prompts import (
     get_optimization_description,
@@ -52,7 +56,7 @@ class PromptOptimizer:
         self,
         api_key: str | None = None,
         base_url: str | None = None,
-        default_model: str | None = None,
+        optimizer_model: str | None = None,
         timeout: float = DEFAULT_TIMEOUT,
         max_retries: int = DEFAULT_MAX_RETRIES,
         retry_delay: float = DEFAULT_RETRY_DELAY,
@@ -63,7 +67,7 @@ class PromptOptimizer:
         Args:
             api_key: OpenRouter API key (if None, tries to get from environment)
             base_url: OpenRouter base URL (if None, tries to get from environment)
-            default_model: Default model for optimization (if None, uses default)
+            optimizer_model: Model that does the optimization work (if None, uses env or default)
             timeout: Request timeout in seconds
             max_retries: Maximum number of retry attempts
             retry_delay: Delay between retry attempts in seconds
@@ -78,8 +82,8 @@ class PromptOptimizer:
         self.base_url = (
             base_url or os.getenv(ENV_OPENROUTER_BASE_URL) or DEFAULT_BASE_URL
         )
-        self.default_model = default_model or os.getenv(
-            ENV_DEFAULT_OPTIMIZER_MODEL, DEFAULT_OPTIMIZER_MODEL
+        self.optimizer_model = optimizer_model or os.getenv(
+            ENV_OPTIMIZER_MODEL, DEFAULT_OPTIMIZER_MODEL
         )
 
         self.client = OpenRouterClient(
@@ -96,6 +100,7 @@ class PromptOptimizer:
         self,
         prompt: str,
         target_model: str | None = None,
+        provider: Provider | str | None = None,
         optimization_notes: str | None = None,
         use_cache: bool = True,
     ) -> OptimizationResult:
@@ -104,7 +109,8 @@ class PromptOptimizer:
 
         Args:
             prompt: The original prompt to optimize
-            target_model: The target model name (if None, uses default)
+            target_model: The target model name (short form like "claude-sonnet-4", "gpt-4o")
+            provider: The provider to use ("anthropic", "openrouter", "openai", "google")
             optimization_notes: Additional notes for optimization
             use_cache: Whether to use cached results
 
@@ -118,34 +124,36 @@ class PromptOptimizer:
             msg = "Prompt cannot be empty"
             raise ValueError(msg)
 
-        target_model = target_model or self.default_model
+        target_model = target_model or "claude-3.5-sonnet"  # Default to a widely available model
+        
+        # Resolve model and provider for the target model (what we're optimizing FOR)
+        try:
+            actual_target_model, target_family, resolved_provider = resolve_model_and_provider(target_model, provider)
+        except ValueError as e:
+            raise ModelNotFoundError(str(e))
 
-        if not is_supported_model(target_model):
-            raise ModelNotFoundError(target_model)
-
-        cache_key = f"{prompt}:{target_model}:{optimization_notes or ''}"
+        cache_key = f"{prompt}:{actual_target_model}:{optimization_notes or ''}"
 
         if use_cache and cache_key in self._optimization_cache:
             return self._optimization_cache[cache_key]
-
+        
         try:
-            family = detect_model_family(target_model)
-        except ValueError as e:
-            raise ModelNotFoundError(str(e))
-        try:
+            # Get optimization prompt based on target model family (no provider-specific differences)
             system_prompt = get_optimization_prompt(
-                family.value,
+                target_family.value,
                 prompt,
-                target_model,
+                actual_target_model,
             )
         except ValueError as e:
             msg = f"Failed to get optimization prompt: {e!s}"
             raise PromptOptimizerError(msg)
+        
         start_time = time.time()
         try:
+            # Use the OPTIMIZER model to do the actual optimization work (not the target model)
             optimized_prompt = await self.client.optimize_prompt(
                 prompt=prompt,
-                model=target_model,
+                model=self.optimizer_model,  # This model does the optimization work
                 system_prompt=system_prompt,
             )
             optimization_time = time.time() - start_time
@@ -153,8 +161,9 @@ class PromptOptimizer:
             result = OptimizationResult(
                 original=prompt,
                 optimized=optimized_prompt,
-                target_model=target_model,
-                target_family=family,
+                target_model=actual_target_model,  # What we optimized FOR
+                target_family=target_family,
+                provider=resolved_provider,
                 optimization_notes=optimization_notes,
                 optimization_time=optimization_time,
             )
@@ -296,3 +305,23 @@ class PromptOptimizer:
     def get_cache_size(self) -> int:
         """Get the current cache size."""
         return len(self._optimization_cache)
+    
+    def get_supported_providers(self) -> list[Provider]:
+        """Get all supported providers."""
+        return get_all_supported_providers()
+    
+    def get_supported_models_for_provider(self, provider: Provider | str) -> dict[str, ModelFamily]:
+        """Get all supported models for a specific provider."""
+        return get_supported_models_by_provider(provider)
+    
+    def list_available_models(self) -> dict[str, dict[str, ModelFamily]]:
+        """
+        Get all available models organized by provider.
+        
+        Returns:
+            Dictionary with provider names as keys and model dictionaries as values
+        """
+        result = {}
+        for provider in self.get_supported_providers():
+            result[provider.value] = self.get_supported_models_for_provider(provider)
+        return result

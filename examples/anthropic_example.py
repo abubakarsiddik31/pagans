@@ -20,7 +20,12 @@ async def main():
 
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
-        print("Please set OPENROUTER_API_KEY environment variable")
+        print("❌ OPENROUTER_API_KEY environment variable not found!")
+        print("\nTo run this example:")
+        print("1. Get an API key from https://openrouter.ai/")
+        print("2. Set the environment variable:")
+        print("   export OPENROUTER_API_KEY='your-api-key-here'")
+        print("3. Run the example again")
         return
 
     optimizer = PromptOptimizer(api_key=api_key)
@@ -29,19 +34,23 @@ async def main():
     Explain the concept of recursion in programming with a clear example.
     """
 
-    target_model = "anthropic/claude-3.7-sonnet"
+    # Test with Claude 3.5 Sonnet using short model name and provider
+    target_model = "claude-3.5-sonnet"
+    provider = "openrouter"
 
     try:
-        print("Optimizing prompt for Anthropic Claude-3.5-Sonnet...")
+        print(f"Optimizing prompt for Claude 3.5 Sonnet via {provider.upper()}...")
         print(f"Original prompt: {original_prompt.strip()}")
 
         result = await optimizer.optimize(
             prompt=original_prompt,
             target_model=target_model,
+            provider=provider,
         )
 
         print("\n✅ Optimization complete!")
         print(f"Target model: {result.target_model}")
+        print(f"Provider: {result.provider.value}")
         print(f"Target family: {result.target_family.value}")
         print(f"Optimization time: {result.optimization_time:.2f}s")
         print(f"\nOptimized prompt:\n{result.optimized}")
