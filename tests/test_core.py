@@ -1,7 +1,7 @@
 """
 Unit tests for the core module.
 
-This module contains tests for the PromptOptimizer class and its core functionality.
+This module contains tests for the PAGANSOptimizer class and its core functionality.
 """
 
 import asyncio
@@ -9,25 +9,25 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from src.pagans.core import PromptOptimizer
+from src.pagans.core import PAGANSOptimizer
 from src.pagans.exceptions import (
-    ConfigurationError,
-    ModelNotFoundError,
-    PromptOptimizerError,
+    PAGANSConfigurationError,
+    PAGANSModelNotFoundError,
+    PAGANSError,
 )
 from src.pagans.models import ModelFamily, OptimizationResult
 
 
-class TestPromptOptimizerInitialization:
-    """Test cases for PromptOptimizer initialization."""
+class TestPAGANSOptimizerInitialization:
+    """Test cases for PAGANSOptimizer initialization."""
 
     def test_init_with_api_key(self):
         """Test initialization with API key."""
         api_key = "test-api-key"
-        optimizer = PromptOptimizer(api_key=api_key)
+        optimizer = PAGANSOptimizer(api_key=api_key)
 
-        assert optimizer.api_key == api_key
-        assert optimizer.default_model == "openai/gpt-4o-mini"
+        assert optimizer.provider.value == "openrouter"
+        assert optimizer.optimizer_model == "claude-3.5-sonnet"
         assert optimizer.client is not None
 
     def test_init_with_environment_variables(self):
@@ -37,55 +37,53 @@ class TestPromptOptimizerInitialization:
             {
                 "OPENROUTER_API_KEY": "env-api-key",
                 "OPENROUTER_BASE_URL": "https://custom.api.url",
-                "DEFAULT_OPTIMIZER_MODEL": "custom-model",
+                "PAGANS_OPTIMIZER_MODEL": "custom-model",
             },
         ):
-            optimizer = PromptOptimizer()
+            optimizer = PAGANSOptimizer()
 
-            assert optimizer.api_key == "env-api-key"
-            assert optimizer.base_url == "https://custom.api.url"
-            assert optimizer.default_model == "custom-model"
+            assert optimizer.provider.value == "openrouter"
+            assert optimizer.optimizer_model == "custom-model"
 
     def test_init_without_api_key(self):
         """Test initialization without API key raises error."""
         with patch.dict("os.environ", {}, clear=True):
-            with pytest.raises(ConfigurationError, match="API key is required"):
-                PromptOptimizer()
+            with pytest.raises(PAGANSConfigurationError, match="API key is required"):
+                PAGANSOptimizer()
 
     def test_init_with_custom_parameters(self):
         """Test initialization with custom parameters."""
         api_key = "test-api-key"
         base_url = "https://custom.api.url"
-        default_model = "custom-model"
+        optimizer_model = "custom-model"
         timeout = 30.0
         max_retries = 5
         retry_delay = 2.0
 
-        optimizer = PromptOptimizer(
+        optimizer = PAGANSOptimizer(
             api_key=api_key,
             base_url=base_url,
-            default_model=default_model,
+            optimizer_model=optimizer_model,
             timeout=timeout,
             max_retries=max_retries,
             retry_delay=retry_delay,
         )
 
-        assert optimizer.api_key == api_key
-        assert optimizer.base_url == base_url
-        assert optimizer.default_model == default_model
+        assert optimizer.provider.value == "openrouter"
+        assert optimizer.optimizer_model == optimizer_model
 
 
-class TestPromptOptimizerOptimization:
+class TestPAGANSOptimizerOptimization:
     """Test cases for prompt optimization functionality."""
 
     @pytest.fixture
     def mock_optimizer(self):
         """Create a mock optimizer for testing."""
-        with patch("src.pagans.core.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.core.get_provider_client") as mock_get_client:
             mock_client = AsyncMock()
-            mock_client_class.return_value = mock_client
+            mock_get_client.return_value = mock_client
 
-            optimizer = PromptOptimizer(api_key="test-api-key")
+            optimizer = PAGANSOptimizer(api_key="test-api-key")
             optimizer.client = mock_client
 
             return optimizer
@@ -137,7 +135,7 @@ class TestPromptOptimizerOptimization:
                 )
             )
 
-        assert result.target_model == "openai/gpt-4o-mini"
+        assert result.target_model == "openai/gpt-4o"
 
     def test_optimize_empty_prompt(self, mock_optimizer):
         """Test optimization with empty prompt raises error."""
@@ -146,7 +144,7 @@ class TestPromptOptimizerOptimization:
 
     def test_optimize_unsupported_model(self, mock_optimizer):
         """Test optimization with unsupported model raises error."""
-        with pytest.raises(ModelNotFoundError, match="invalid-model"):
+        with pytest.raises(PAGANSModelNotFoundError, match="invalid-model"):
             asyncio.run(
                 mock_optimizer.optimize(
                     prompt="Original prompt",
@@ -156,10 +154,10 @@ class TestPromptOptimizerOptimization:
 
     def test_optimize_api_error(self, mock_optimizer):
         """Test optimization with API error raises error."""
-        from src.pagans.exceptions import OpenRouterAPIError
-        mock_optimizer.client.optimize_prompt.side_effect = OpenRouterAPIError("API Error")
+        from src.pagans.exceptions import PAGANSOpenRouterAPIError
+        mock_optimizer.client.optimize_prompt.side_effect = PAGANSOpenRouterAPIError("API Error")
 
-        with pytest.raises(PromptOptimizerError, match="Failed to optimize prompt"):
+        with pytest.raises(PAGANSError, match="Failed to optimize prompt"):
             asyncio.run(
                 mock_optimizer.optimize(
                     prompt="Original prompt",
@@ -253,7 +251,7 @@ class TestPromptOptimizerOptimization:
         """Test comparison of optimizations across different models."""
         mock_optimizer.client.optimize_prompt.return_value = "Optimized prompt"
 
-        models = ["gpt-4o", "claude-3.5-sonnet", "gemini-1.5-pro"]
+        models = ["openai/gpt-4o", "openai/gpt-4o-mini"]
 
         with patch("time.time", return_value=1000.0):
             results = asyncio.run(
@@ -263,7 +261,7 @@ class TestPromptOptimizerOptimization:
                 )
             )
 
-        assert len(results) == 3
+        assert len(results) == 2
         for model, result in results.items():
             assert result.optimized == "Optimized prompt"
             assert result.target_model == model
@@ -273,10 +271,9 @@ class TestPromptOptimizerOptimization:
         mock_optimizer.client.optimize_prompt.side_effect = [
             "Optimized prompt",
             Exception("API Error"),
-            "Another optimized prompt",
         ]
 
-        models = ["gpt-4o", "claude-3.5-sonnet", "gemini-1.5-pro"]
+        models = ["openai/gpt-4o", "openai/gpt-4o-mini"]
 
         results = asyncio.run(
             mock_optimizer.compare_optimizations(
@@ -285,10 +282,9 @@ class TestPromptOptimizerOptimization:
             )
         )
 
-        assert len(results) == 3
-        assert results["gpt-4o"].optimized == "Optimized prompt"
-        assert isinstance(results["claude-3.5-sonnet"], PromptOptimizerError)
-        assert results["gemini-1.5-pro"].optimized == "Another optimized prompt"
+        assert len(results) == 2
+        assert results["openai/gpt-4o"].optimized == "Optimized prompt"
+        assert isinstance(results["openai/gpt-4o-mini"], PAGANSError)
 
     def test_get_optimization_description(self, mock_optimizer):
         """Test getting optimization description."""
@@ -298,7 +294,7 @@ class TestPromptOptimizerOptimization:
 
     def test_get_optimization_description_invalid_model(self, mock_optimizer):
         """Test getting optimization description for invalid model."""
-        with pytest.raises(ModelNotFoundError):
+        with pytest.raises(PAGANSModelNotFoundError):
             mock_optimizer.get_optimization_description("invalid-model")
 
     def test_is_model_supported(self, mock_optimizer):

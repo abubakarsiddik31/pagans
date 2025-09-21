@@ -1,0 +1,26 @@
+include README.md
+include CHANGELOG.md
+include LICENSE
+include .env.example
+include logo.png
+
+# Include all template files
+recursive-include src/pagans/optimizer_prompts/templates *.jinja
+
+# Include test files for completeness
+recursive-include tests *.py
+
+# Include example files
+recursive-include examples *.py
+
+# Include development configuration files
+include .python-version
+include pyproject.toml
+include uv.lock
+
+# Include GitHub workflow files
+recursive-include .github *.yml
+recursive-include .github *.yaml
+
+# Include documentation configuration
+include .readthedocs.yml

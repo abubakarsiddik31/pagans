@@ -7,8 +7,8 @@ This module defines the exception hierarchy used throughout the package.
 from typing import Any
 
 
-class PromptOptimizerError(Exception):
-    """Base exception class for all Prompt Optimizer errors."""
+class PAGANSError(Exception):
+    """Base exception class for all PAGANS errors."""
 
     def __init__(self, message: str, details: Any | None = None):
         self.message = message
@@ -16,7 +16,7 @@ class PromptOptimizerError(Exception):
         super().__init__(self.message)
 
 
-class OpenRouterAPIError(PromptOptimizerError):
+class PAGANSOpenRouterAPIError(PAGANSError):
     """Exception raised when OpenRouter API returns an error."""
 
     def __init__(
@@ -30,7 +30,7 @@ class OpenRouterAPIError(PromptOptimizerError):
         self.response_data = response_data
 
 
-class ModelNotFoundError(PromptOptimizerError):
+class PAGANSModelNotFoundError(PAGANSError):
     """Exception raised when a model is not recognized or supported."""
 
     def __init__(self, model_name: str):
@@ -38,15 +38,15 @@ class ModelNotFoundError(PromptOptimizerError):
         super().__init__(message, model_name)
 
 
-class ConfigurationError(PromptOptimizerError):
+class PAGANSConfigurationError(PAGANSError):
     """Exception raised when configuration is invalid or missing."""
 
 
-class NetworkError(PromptOptimizerError):
+class PAGANSNetworkError(PAGANSError):
     """Exception raised when network-related errors occur."""
 
 
-class TimeoutError(PromptOptimizerError):
+class PAGANSTimeoutError(PAGANSError):
     """Exception raised when a request times out."""
 
     def __init__(self, timeout: float):
@@ -54,7 +54,7 @@ class TimeoutError(PromptOptimizerError):
         super().__init__(message, timeout)
 
 
-class RateLimitError(PromptOptimizerError):
+class PAGANSRateLimitError(PAGANSError):
     """Exception raised when rate limits are exceeded."""
 
     def __init__(self, retry_after: int | None = None):
@@ -64,13 +64,13 @@ class RateLimitError(PromptOptimizerError):
         super().__init__(message, retry_after)
 
 
-class ValidationError(PromptOptimizerError):
+class PAGANSValidationError(PAGANSError):
     """Exception raised when input validation fails."""
 
 
-class AuthenticationError(PromptOptimizerError):
+class PAGANSAuthenticationError(PAGANSError):
     """Exception raised when authentication fails."""
 
 
-class QuotaExceededError(PromptOptimizerError):
+class PAGANSQuotaExceededError(PAGANSError):
     """Exception raised when API quota is exceeded."""

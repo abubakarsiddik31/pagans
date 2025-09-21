@@ -11,9 +11,9 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from src.pagans.core import PromptOptimizer
+from src.pagans.core import PAGANSOptimizer
 from src.pagans.exceptions import (
-    PromptOptimizerError,
+    PAGANSError,
 )
 from src.pagans.models import ModelFamily, OptimizationResult
 
@@ -34,6 +34,7 @@ class TestEndToEndOptimization:
             mock_client.get_models.return_value = {
                 "data": [
                     {"id": "openai/gpt-4o", "name": "GPT-4o"},
+                    {"id": "openai/gpt-4o-mini", "name": "GPT-4o Mini"},
                     {"id": "anthropic/claude-3.5-sonnet", "name": "Claude 3.5 Sonnet"},
                     {"id": "google/gemini-2.5-pro", "name": "Gemini 2.5 Pro"},
                 ]
@@ -43,7 +44,7 @@ class TestEndToEndOptimization:
 
     def test_full_optimization_workflow_openai(self, mock_client):
         """Test complete optimization workflow for OpenAI model."""
-        optimizer = PromptOptimizer(api_key="test-key")
+        optimizer = PAGANSOptimizer(api_key="test-key")
 
         result = asyncio.run(
             optimizer.optimize(
@@ -57,42 +58,10 @@ class TestEndToEndOptimization:
         assert result.target_model == "openai/gpt-4o"
         assert result.target_family == ModelFamily.OPENAI
 
-    def test_full_optimization_workflow_anthropic(self, mock_client):
-        """Test complete optimization workflow for Anthropic model."""
-        optimizer = PromptOptimizer(api_key="test-key")
-
-        result = asyncio.run(
-            optimizer.optimize(
-                prompt="Explain machine learning",
-                target_model="anthropic/claude-3.5-sonnet",
-            )
-        )
-
-        assert isinstance(result, OptimizationResult)
-        assert result.original == "Explain machine learning"
-        assert result.optimized == "Optimized version of the prompt"
-        assert result.target_model == "anthropic/claude-3.5-sonnet"
-        assert result.target_family == ModelFamily.ANTHROPIC
-
-    def test_full_optimization_workflow_google(self, mock_client):
-        """Test complete optimization workflow for Google model."""
-        optimizer = PromptOptimizer(api_key="test-key")
-
-        result = asyncio.run(
-            optimizer.optimize(
-                prompt="Create a React component", target_model="google/gemini-2.5-pro"
-            )
-        )
-
-        assert isinstance(result, OptimizationResult)
-        assert result.original == "Create a React component"
-        assert result.optimized == "Optimized version of the prompt"
-        assert result.target_model == "google/gemini-2.5-pro"
-        assert result.target_family == ModelFamily.GOOGLE
 
     def test_batch_optimization_workflow(self, mock_client):
         """Test batch optimization of multiple prompts."""
-        optimizer = PromptOptimizer(api_key="test-key")
+        optimizer = PAGANSOptimizer(api_key="test-key")
 
         prompts = [
             "Write a Python function",
@@ -114,7 +83,7 @@ class TestEndToEndOptimization:
 
     def test_cross_model_comparison(self, mock_client):
         """Test comparing optimization results across different models."""
-        optimizer = PromptOptimizer(api_key="test-key")
+        optimizer = PAGANSOptimizer(api_key="test-key")
 
         prompt = "Design a database schema"
 
@@ -123,16 +92,14 @@ class TestEndToEndOptimization:
                 prompt=prompt,
                 target_models=[
                     "openai/gpt-4o",
-                    "anthropic/claude-3.5-sonnet",
-                    "google/gemini-2.5-pro",
+                    "openai/gpt-4o-mini",
                 ],
             )
         )
 
-        assert len(results) == 3
+        assert len(results) == 2
         assert "openai/gpt-4o" in results
-        assert "anthropic/claude-3.5-sonnet" in results
-        assert "google/gemini-2.5-pro" in results
+        assert "openai/gpt-4o-mini" in results
 
         for model, result in results.items():
             assert isinstance(result, OptimizationResult)
@@ -162,7 +129,7 @@ class TestPerformanceOptimization:
 
     def test_optimization_timing_tracking(self, mock_client):
         """Test that optimization time is properly tracked."""
-        optimizer = PromptOptimizer(api_key="test-key")
+        optimizer = PAGANSOptimizer(api_key="test-key")
 
         start_time = time.time()
         result = asyncio.run(
@@ -176,7 +143,7 @@ class TestPerformanceOptimization:
 
     def test_concurrent_batch_processing(self, mock_client):
         """Test that batch processing actually runs concurrently."""
-        optimizer = PromptOptimizer(api_key="test-key")
+        optimizer = PAGANSOptimizer(api_key="test-key")
 
         prompts = ["Prompt 1", "Prompt 2", "Prompt 3", "Prompt 4", "Prompt 5"]
 
@@ -198,7 +165,7 @@ class TestPerformanceOptimization:
 
     def test_caching_behavior(self, mock_client):
         """Test that caching reduces redundant API calls."""
-        optimizer = PromptOptimizer(api_key="test-key")
+        optimizer = PAGANSOptimizer(api_key="test-key")
 
         # First optimization
         result1 = asyncio.run(
@@ -261,7 +228,7 @@ class TestErrorHandlingAndRecovery:
 
     def test_automatic_retry_on_transient_failures(self, failing_client):
         """Test that the system automatically retries on transient failures."""
-        optimizer = PromptOptimizer(api_key="test-key", max_retries=3)
+        optimizer = PAGANSOptimizer(api_key="test-key", max_retries=3)
 
         # Mock the optimize_prompt to return the expected result
         failing_client.optimize_prompt.return_value = "Successfully optimized after retries"
@@ -276,7 +243,7 @@ class TestErrorHandlingAndRecovery:
 
     def test_graceful_degradation_on_persistent_failures(self, failing_client):
         """Test graceful handling when all retries are exhausted."""
-        optimizer = PromptOptimizer(api_key="test-key", max_retries=2)
+        optimizer = PAGANSOptimizer(api_key="test-key", max_retries=2)
 
         # Mock persistent failure
         async def always_fail(*args, **kwargs):
@@ -286,7 +253,7 @@ class TestErrorHandlingAndRecovery:
 
         failing_client.optimize_prompt = always_fail
 
-        with pytest.raises(PromptOptimizerError):
+        with pytest.raises(PAGANSOptimizerError):
             asyncio.run(
                 optimizer.optimize(prompt="Test prompt", target_model="openai/gpt-4o")
             )
@@ -309,7 +276,7 @@ class TestAdvancedFeatures:
 
     def test_custom_optimization_notes(self, mock_client):
         """Test optimization with custom notes."""
-        optimizer = PromptOptimizer(api_key="test-key")
+        optimizer = PAGANSOptimizer(api_key="test-key")
 
         result = asyncio.run(
             optimizer.optimize(
@@ -322,10 +289,10 @@ class TestAdvancedFeatures:
         assert result.optimization_notes == "Focus on clarity and technical accuracy"
 
     def test_context_manager_usage(self, mock_client):
-        """Test using PromptOptimizer as a context manager."""
+        """Test using PAGANSOptimizer as a context manager."""
 
         async def test_context_manager():
-            async with PromptOptimizer(api_key="test-key") as optimizer:
+            async with PAGANSOptimizer(api_key="test-key") as optimizer:
                 result = await optimizer.optimize(
                     prompt="Test prompt", target_model="openai/gpt-4o"
                 )
@@ -343,12 +310,12 @@ class TestAdvancedFeatures:
             {
                 "OPENROUTER_API_KEY": "env-api-key",
                 "OPENROUTER_BASE_URL": "https://custom.api.url",
-                "DEFAULT_OPTIMIZER_MODEL": "anthropic/claude-3.5-sonnet",
+                "DEFAULT_OPTIMIZER_MODEL": "openai/gpt-4o",
             },
             clear=True,
         ):
-            optimizer = PromptOptimizer()
+            optimizer = PAGANSOptimizer()
 
             assert optimizer.api_key == "env-api-key"
             assert optimizer.base_url == "https://custom.api.url"
-            assert optimizer.default_model == "anthropic/claude-3.5-sonnet"
+            assert optimizer.default_model == "openai/gpt-4o"

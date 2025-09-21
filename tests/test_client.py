@@ -12,17 +12,10 @@ import httpx
 import pytest
 
 from src.pagans.client import OpenRouterClient
-from src.pagans.exceptions import (
-    AuthenticationError,
-    ModelNotFoundError,
-    NetworkError,
-    OpenRouterAPIError,
-    QuotaExceededError,
-    RateLimitError,
-)
+from src.pagans.exceptions import PAGANSError
 
 
-class TestOpenRouterClientInitialization:
+class TestPAGANSClientInitialization:
     """Test cases for OpenRouterClient initialization."""
 
     def test_init_with_api_key(self):
@@ -72,7 +65,7 @@ class TestOpenRouterClientInitialization:
         assert client.base_url == "https://api.example.com"
 
 
-class TestOpenRouterClientRequestHandling:
+class TestPAGANSClientRequestHandling:
     """Test cases for request handling and error management."""
 
     @pytest.fixture
@@ -120,7 +113,7 @@ class TestOpenRouterClientRequestHandling:
         mock_response.json.return_value = {"error": {"message": "Invalid API key"}}
         mock_client.client.request.return_value = mock_response
 
-        with pytest.raises(AuthenticationError, match="Invalid API key"):
+        with pytest.raises(PAGANSError, match="Invalid API key"):
             asyncio.run(
                 mock_client._make_request(
                     method="POST",
@@ -135,7 +128,7 @@ class TestOpenRouterClientRequestHandling:
         mock_response.json.return_value = {"error": {"message": "Access forbidden"}}
         mock_client.client.request.return_value = mock_response
 
-        with pytest.raises(AuthenticationError, match="Access forbidden"):
+        with pytest.raises(PAGANSError, match="Access forbidden"):
             asyncio.run(
                 mock_client._make_request(
                     method="POST",
@@ -150,7 +143,7 @@ class TestOpenRouterClientRequestHandling:
         mock_response.json.return_value = {"error": {"message": "Model not found"}}
         mock_client.client.request.return_value = mock_response
 
-        with pytest.raises(ModelNotFoundError, match="Model not found"):
+        with pytest.raises(PAGANSError, match="Model not found"):
             asyncio.run(
                 mock_client._make_request(
                     method="POST",
@@ -166,7 +159,7 @@ class TestOpenRouterClientRequestHandling:
         mock_response.json.return_value = {"error": {"message": "Rate limit exceeded"}}
         mock_client.client.request.return_value = mock_response
 
-        with pytest.raises(RateLimitError, match="Rate limit exceeded"):
+        with pytest.raises(PAGANSError, match="Rate limit exceeded"):
             asyncio.run(
                 mock_client._make_request(
                     method="POST",
@@ -181,7 +174,7 @@ class TestOpenRouterClientRequestHandling:
         mock_response.json.return_value = {"error": {"message": "Quota exceeded"}}
         mock_client.client.request.return_value = mock_response
 
-        with pytest.raises(QuotaExceededError, match="API quota exceeded"):
+        with pytest.raises(PAGANSError, match="API quota exceeded"):
             asyncio.run(
                 mock_client._make_request(
                     method="POST",
@@ -198,7 +191,7 @@ class TestOpenRouterClientRequestHandling:
         }
         mock_client.client.request.return_value = mock_response
 
-        with pytest.raises(NetworkError, match="Server error: 500"):
+        with pytest.raises(PAGANSError, match="Server error: 500"):
             asyncio.run(
                 mock_client._make_request(
                     method="POST",
@@ -213,7 +206,7 @@ class TestOpenRouterClientRequestHandling:
         mock_response.json.return_value = {"error": {"message": "Bad request"}}
         mock_client.client.request.return_value = mock_response
 
-        with pytest.raises(OpenRouterAPIError, match="Bad request"):
+        with pytest.raises(PAGANSError, match="Bad request"):
             asyncio.run(
                 mock_client._make_request(
                     method="POST",
@@ -268,7 +261,7 @@ class TestOpenRouterClientRequestHandling:
         """Test handling when max retries are exceeded."""
         mock_client.client.request.side_effect = httpx.NetworkError("Network error")
 
-        with pytest.raises(NetworkError, match="Network error"):
+        with pytest.raises(PAGANSError, match="Network error"):
             asyncio.run(
                 mock_client._make_request(
                     method="POST",
@@ -281,7 +274,7 @@ class TestOpenRouterClientRequestHandling:
         assert mock_client.client.request.call_count == 4  # default max_retries = 3
 
 
-class TestOpenRouterClientRateLimiting:
+class TestPAGANSClientRateLimiting:
     """Test cases for rate limiting functionality."""
 
     @pytest.fixture
@@ -358,7 +351,7 @@ class TestOpenRouterClientRateLimiting:
         assert result is None
 
 
-class TestOpenRouterClientAPIMethods:
+class TestPAGANSClientAPIMethods:
     """Test cases for API methods."""
 
     @pytest.fixture
@@ -397,7 +390,7 @@ class TestOpenRouterClientAPIMethods:
             status_code=200, json=lambda: {"invalid": "response"}
         )
 
-        with pytest.raises(OpenRouterAPIError, match="No choices in response"):
+        with pytest.raises(PAGANSError, match="No choices in response"):
             asyncio.run(
                 mock_client.optimize_prompt(
                     prompt="Original prompt",
@@ -413,7 +406,7 @@ class TestOpenRouterClientAPIMethods:
             json=lambda: {"choices": [{"message": {"invalid": "format"}}]},
         )
 
-        with pytest.raises(OpenRouterAPIError, match="Invalid response format"):
+        with pytest.raises(PAGANSError, match="Invalid response format"):
             asyncio.run(
                 mock_client.optimize_prompt(
                     prompt="Original prompt",

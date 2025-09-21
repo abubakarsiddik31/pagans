@@ -1,6 +1,10 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "pagans"
-version = "0.1.0"
+dynamic = ["version"]
 description = "😅 Prompts Aligned to Guidelines and Normalization System - Optimize prompts for OpenAI, Anthropic, and Google models"
 readme = "README.md"
 license = {text = "MIT"}
@@ -50,6 +54,12 @@ Documentation = "https://pagans.readthedocs.io/"
 Repository = "https://github.com/abubakarsiddik31/pagans"
 Issues = "https://github.com/abubakarsiddik31/pagans/issues"
 Changelog = "https://github.com/abubakarsiddik31/pagans/blob/main/CHANGELOG.md"
+"Source Code" = "https://github.com/abubakarsiddik31/pagans"
+"Download" = "https://pypi.org/project/pagans/"
+"Bug Reports" = "https://github.com/abubakarsiddik31/pagans/issues"
+
+[project.scripts]
+pagans = "main:main"
 
 [project.optional-dependencies]
 dev = [
@@ -78,6 +88,11 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools_scm]
+write_to = "src/pagans/_version.py"
+root = "."
+version_file = "src/pagans/__version__.py"
 
 [tool.ruff]
 line-length = 88
@@ -109,3 +124,41 @@ warn_unused_ignores = true
 warn_no_return = true
 warn_unreachable = true
 strict_equality = true
+
+[tool.setuptools.package-data]
+"pagans" = ["optimizer_prompts/templates/**/*.jinja"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+[tool.coverage.run]
+source = ["src/pagans"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "src/pagans/__version__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]

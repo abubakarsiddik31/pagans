@@ -3,23 +3,24 @@ PAGANS - Prompts Aligned to Guidelines and Normalization System 😅
 
 A comprehensive Python package for optimizing prompts across different LLM model families.
 PAGANS provides tools to align your prompts with model-specific guidelines and normalization
-standards for OpenAI, Anthropic, Google, Meta, and Mistral models using the OpenRouter API.
+standards using the OpenRouter API.
 """
 
-from .client import OpenRouterClient
-from .core import PromptOptimizer
+from .clients.openrouter import OpenRouterClient
+from .core import PAGANSOptimizer
 from .exceptions import (
-    AuthenticationError,
-    ConfigurationError,
-    ModelNotFoundError,
-    NetworkError,
-    OpenRouterAPIError,
-    PromptOptimizerError,
-    QuotaExceededError,
-    RateLimitError,
-    TimeoutError,
-    ValidationError,
+    PAGANSAuthenticationError,
+    PAGANSConfigurationError,
+    PAGANSModelNotFoundError,
+    PAGANSNetworkError,
+    PAGANSOpenRouterAPIError,
+    PAGANSError,
+    PAGANSQuotaExceededError,
+    PAGANSRateLimitError,
+    PAGANSTimeoutError,
+    PAGANSValidationError,
 )
+
 from .models import (
     ModelFamily,
     OptimizationRequest,
@@ -28,6 +29,7 @@ from .models import (
     get_supported_models,
     is_supported_model,
 )
+from .models.registry import get_model_registry, register_model_family, register_provider
 from .optimizer_prompts import (
     get_optimization_description,
     get_optimization_prompt,
@@ -38,18 +40,22 @@ __version__ = "0.1.0"
 __author__ = "PAGANS Team"
 __email__ = "contact@pagans.dev"
 __description__ = (
-    "Prompts Aligned to Guidelines and Normalization System - Optimize prompts across LLM model families"
+    "Prompts Aligned to Guidelines and Normalization System - Optimize prompts across LLM model families using OpenRouter"
 )
 
 # Main exports
 __all__ = [
     # Main classes
-    "PromptOptimizer",
+    "PAGANSOptimizer",
     "OpenRouterClient",
     # Models and data structures
     "ModelFamily",
     "OptimizationResult",
     "OptimizationRequest",
+    # Registry and factory components
+    "get_model_registry",
+    "register_model_family",
+    "register_provider",
     # Utility functions
     "detect_model_family",
     "get_supported_models",
@@ -58,16 +64,16 @@ __all__ = [
     "get_optimization_description",
     "get_supported_families",
     # Exceptions
-    "PromptOptimizerError",
-    "OpenRouterAPIError",
-    "ModelNotFoundError",
-    "ConfigurationError",
-    "NetworkError",
-    "TimeoutError",
-    "RateLimitError",
-    "ValidationError",
-    "AuthenticationError",
-    "QuotaExceededError",
+    "PAGANSError",
+    "PAGANSOpenRouterAPIError",
+    "PAGANSModelNotFoundError",
+    "PAGANSConfigurationError",
+    "PAGANSNetworkError",
+    "PAGANSTimeoutError",
+    "PAGANSRateLimitError",
+    "PAGANSValidationError",
+    "PAGANSAuthenticationError",
+    "PAGANSQuotaExceededError",
 ]
 
 
@@ -76,9 +82,9 @@ def create_optimizer(
     api_key: str = None,
     base_url: str = None,
     default_model: str = None,
-) -> PromptOptimizer:
+) -> PAGANSOptimizer:
     """
-    Create a PAGANS PromptOptimizer instance with the given configuration.
+    Create a PAGANS PAGANSOptimizer instance with the given configuration.
 
     Args:
         api_key: OpenRouter API key (if None, tries to get from environment)
@@ -86,22 +92,22 @@ def create_optimizer(
         default_model: Default model for optimization (if None, uses default)
 
     Returns:
-        PromptOptimizer instance
+        PAGANSOptimizer instance
 
     Raises:
-        ConfigurationError: If API key is not provided or found
+        PAGANSConfigurationError: If API key is not provided or found
     """
-    return PromptOptimizer(
+    return PAGANSOptimizer(
         api_key=api_key,
         base_url=base_url,
-        default_model=default_model,
+        optimizer_model=default_model,
     )
 
 
 # Quick start example
 def quick_start_example():
     """
-    Example usage of PAGANS PromptOptimizer.
+    Example usage of PAGANS PAGANSOptimizer.
 
     This function demonstrates how to use PAGANS to optimize a prompt for better LLM performance.
     """

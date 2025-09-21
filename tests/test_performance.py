@@ -12,7 +12,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from src.pagans.core import PromptOptimizer
+from src.pagans.core import PAGANSOptimizer
 from src.pagans.models import OptimizationResult
 
 
@@ -54,7 +54,7 @@ class TestPerformanceBenchmarks:
 
     def test_concurrent_load_handling(self, fast_mock_client):
         """Test handling of concurrent optimization requests."""
-        optimizer = PromptOptimizer(api_key="test-key")
+        optimizer = PAGANSOptimizer(api_key="test-key")
 
         async def concurrent_optimizations():
             tasks = []
@@ -78,7 +78,7 @@ class TestPerformanceBenchmarks:
 
     def test_memory_efficiency_large_prompts(self, fast_mock_client):
         """Test memory efficiency with large prompts."""
-        optimizer = PromptOptimizer(api_key="test-key")
+        optimizer = PAGANSOptimizer(api_key="test-key")
 
         # Create a large prompt (approximately 10KB)
         large_prompt = (
@@ -95,7 +95,7 @@ class TestPerformanceBenchmarks:
 
     def test_scalability_with_increasing_load(self, fast_mock_client):
         """Test scalability as load increases."""
-        optimizer = PromptOptimizer(api_key="test-key")
+        optimizer = PAGANSOptimizer(api_key="test-key")
 
         # Test with different batch sizes
         batch_sizes = [1, 5, 10, 20]
@@ -136,7 +136,7 @@ class TestPerformanceBenchmarks:
 
     def test_caching_performance_impact(self, fast_mock_client):
         """Test performance impact of caching."""
-        optimizer = PromptOptimizer(api_key="test-key")
+        optimizer = PAGANSOptimizer(api_key="test-key")
 
         prompt = "Write a Python function to reverse a string"
         target_model = "openai/gpt-4o"
@@ -191,7 +191,7 @@ class TestStressTests:
 
     def test_high_concurrency_stress(self, resilient_mock_client):
         """Test handling of very high concurrent requests."""
-        optimizer = PromptOptimizer(api_key="test-key")
+        optimizer = PAGANSOptimizer(api_key="test-key")
 
         async def stress_test():
             # Simulate 50 concurrent requests
@@ -220,7 +220,7 @@ class TestStressTests:
 
     def test_memory_usage_large_batch(self, resilient_mock_client):
         """Test memory usage with very large batches."""
-        optimizer = PromptOptimizer(api_key="test-key")
+        optimizer = PAGANSOptimizer(api_key="test-key")
 
         # Create a very large batch
         large_batch = [
@@ -246,7 +246,7 @@ class TestStressTests:
 
     def test_long_running_stability(self, resilient_mock_client):
         """Test stability during long-running operations."""
-        optimizer = PromptOptimizer(api_key="test-key")
+        optimizer = PAGANSOptimizer(api_key="test-key")
 
         async def long_running_test():
             results = []
@@ -302,7 +302,7 @@ class TestResourceManagement:
         """Test that resources are properly cleaned up."""
 
         async def test_cleanup():
-            optimizer = PromptOptimizer(api_key="test-key")
+            optimizer = PAGANSOptimizer(api_key="test-key")
 
             # Use the optimizer
             result = await optimizer.optimize(
@@ -324,7 +324,7 @@ class TestResourceManagement:
         """Test cleanup when using context manager."""
 
         async def test_context_cleanup():
-            async with PromptOptimizer(api_key="test-key") as optimizer:
+            async with PAGANSOptimizer(api_key="test-key") as optimizer:
                 result = await optimizer.optimize(
                     prompt="Test prompt", target_model="openai/gpt-4o"
                 )

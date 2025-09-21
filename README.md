@@ -1,4 +1,4 @@
-# PAGANS - Prompts Aligned to Guidelines and Normalization System 😅
+# PAGANS - Prompt Optimization Framework 😅
 
 <div align="center">
   <img src="logo.png" alt="PAGANS Logo" width="200"/>
@@ -12,18 +12,42 @@
 [![Lint](https://github.com/abubakarsiddik31/pagans/actions/workflows/lint.yml/badge.svg)](https://github.com/abubakarsiddik31/pagans/actions/workflows/lint.yml)
 
 
-A comprehensive Python package for optimizing prompts across different LLM model families using OpenRouter API. PAGANS helps developers align their prompts with model-specific guidelines and normalization standards, ensuring optimal performance across OpenAI GPT, Anthropic Claude, and Google Gemini models.
+**PAGANS** (Prompts Aligned to Guidelines and Normalization System) is a powerful prompt optimization framework that works exclusively with OpenRouter to optimize prompts across different LLM model families. By leveraging model-specific optimization strategies, PAGANS ensures your prompts are perfectly aligned with each model family's unique characteristics and best practices.
 </div>
 
 ## ✨ Features
 
 - 🚀 **Fast Optimization**: Optimize prompts in under 10 seconds
-- 🎯 **Multi-Provider Support**: OpenAI GPT, Anthropic Claude, Google Gemini
+- 🎯 **Model Family Optimization**: Specialized optimization strategies for OpenAI, Anthropic, and Google model families
+- 🔗 **OpenRouter Integration**: Seamless integration with OpenRouter for access to all major model families
 - 🔄 **Async Support**: Full asynchronous API for high-throughput optimization
 - 📊 **Performance Metrics**: Track optimization time and token usage
 - 🔧 **Easy Integration**: Simple API that integrates seamlessly into existing workflows
 - 🧠 **Smart Caching**: Built-in caching to avoid redundant optimizations
 - ⚡ **Batch Processing**: Optimize multiple prompts concurrently
+- 📈 **Model Comparison**: Compare optimization results across different model families
+- 🎨 **Family-Aware Prompts**: Automatically adapts prompts to each model family's unique characteristics
+
+## 🎯 Model Family Optimization
+
+**PAGANS** excels at understanding the unique characteristics of different LLM model families and optimizing prompts accordingly:
+
+### **OpenAI Models** (GPT Series)
+- Emphasizes clear structure and explicit instructions
+- Benefits from chain-of-thought prompting techniques
+- Optimized for conversational and creative tasks
+
+### **Anthropic Models** (Claude Series)
+- Focuses on safety and helpfulness guidelines
+- Works best with detailed context and examples
+- Excels at analysis and reasoning tasks
+
+### **Google Models** (Gemini Series)
+- Leverages multimodal capabilities when available
+- Optimized for factual accuracy and research
+- Performs well with structured data and technical content
+
+**The optimization process automatically detects the target model family and applies the most effective strategies for that specific family, ensuring optimal performance across all supported models.**
 
 ## 📦 Installation
 
@@ -55,28 +79,26 @@ uv sync --dev
 
 ```python
 import asyncio
-from pagans import PromptOptimizer
+from pagans import PAGANSOptimizer
 
 async def main():
-    # Initialize optimizer with your OpenRouter API key
-    optimizer = PromptOptimizer(api_key="your-openrouter-api-key")
+    # Initialize PAGANS optimizer with your OpenRouter API key
+    optimizer = PAGANSOptimizer(api_key="your-openrouter-api-key")
 
     # Your original prompt
     prompt = "Write a Python function to calculate fibonacci numbers"
 
-    # Optimize for a specific model and provider
+    # Optimize for a specific model family
     result = await optimizer.optimize(
         prompt=prompt,
-        target_model="claude-sonnet-4",  # Short model name
-        provider="openrouter"            # Provider selection
+        target_model="claude-sonnet-4"  # Short model name
     )
 
     print(f"Original: {result.original}")
     print(f"Optimized: {result.optimized}")
-    print(f"Model: {result.target_model}")
-    print(f"Provider: {result.provider.value}")
-    print(f"Family: {result.target_family.value}")
-    print(f"Time: {result.optimization_time:.2f}s")
+    print(f"Target Model: {result.target_model}")
+    print(f"Model Family: {result.target_family.value}")
+    print(f"Optimization Time: {result.optimization_time:.2f}s")
 
     await optimizer.close()
 
@@ -88,19 +110,17 @@ asyncio.run(main())
 PAGANS separates the **target model** (what you're optimizing for) from the **optimizer model** (what does the work):
 
 ```python
-# The optimizer model (from .env) does the actual optimization work
+# The optimizer model (from environment) does the actual optimization work
 # The target model is what you're optimizing FOR
 result = await optimizer.optimize(
     prompt="Explain quantum computing",
-    target_model="claude-sonnet-4",  # What you're optimizing FOR
-    provider="openrouter"            # How to access the target model
+    target_model="claude-sonnet-4"  # What you're optimizing FOR
 )
 
-# Same optimization strategy for Claude whether via Anthropic or OpenRouter
+# PAGANS automatically detects the model family and applies the right optimization strategy
 result2 = await optimizer.optimize(
-    prompt="Explain quantum computing", 
-    target_model="claude-sonnet-4",  # Same target
-    provider="anthropic"             # Different provider, same optimization
+    prompt="Explain quantum computing",
+    target_model="gpt-4o"  # Different model family, different optimization strategy
 )
 ```
 
@@ -108,28 +128,22 @@ result2 = await optimizer.optimize(
 
 ```bash
 export OPENROUTER_API_KEY="your-api-key-here"
-export OPTIMIZER_MODEL="openai/gpt-4o-mini"  # Model that does the optimization work
+export PAGANS_OPTIMIZER_MODEL="openai/gpt-4o-mini"  # Model that does the optimization work
 ```
 
 ### Using Environment Variables
 
-```bash
-export OPENROUTER_API_KEY="your-api-key-here"
-export OPTIMIZER_MODEL="anthropic/claude-3.5-sonnet"  # Optional: Model that does optimization work
-```
-
 ```python
 import asyncio
-from pagans import PromptOptimizer
+from pagans import PAGANSOptimizer
 
 async def main():
     # Configuration loaded from environment variables
-    optimizer = PromptOptimizer()
+    optimizer = PAGANSOptimizer()
 
     result = await optimizer.optimize(
         prompt="Explain quantum computing",
-        target_model="claude-3.5-sonnet",  # What you're optimizing FOR
-        provider="openrouter"              # How to access target model
+        target_model="claude-3.5-sonnet"  # What you're optimizing FOR
     )
 
     print(f"Optimized for: {result.target_model}")
@@ -143,13 +157,13 @@ asyncio.run(main())
 
 ```python
 import asyncio
-from pagans import PromptOptimizer
+from pagans import PAGANSOptimizer
 
 async def main():
-    async with PromptOptimizer() as optimizer:
+    async with PAGANSOptimizer() as optimizer:
         result = await optimizer.optimize(
             prompt="Create a REST API in Node.js",
-            target_model="google/gemini-2.5-pro"
+            target_model="gemini-2.5-pro"
         )
         print(result.optimized)
 ```
@@ -157,59 +171,52 @@ async def main():
 ## 🎯 Supported Models
 
 ### Short Model Names (Recommended)
-Use these convenient short names with any supported provider:
+Use these convenient short names with PAGANS:
 
-| Family | Short Names | Providers |
-|--------|-------------|-----------|
-| **OpenAI** | `gpt-4o`, `gpt-4o-mini`, `gpt-5` | `openrouter`, `openai` |
-| **Anthropic** | `claude-opus-4`, `claude-opus-4.1`, `claude-sonnet-4`, `claude-sonnet-3.7`, `claude-3.5-sonnet` | `openrouter`, `anthropic` |
-| **Google** | `gemini-2.5-pro`, `gemini-2.5-flash` | `openrouter`, `google` |
+| Family | Short Names | Available via OpenRouter |
+|--------|-------------|-------------------------|
+| **OpenAI** | `gpt-4o`, `gpt-4o-mini`, `gpt-5` | ✅ |
+| **Anthropic** | `claude-opus-4`, `claude-opus-4.1`, `claude-sonnet-4`, `claude-sonnet-3.7`, `claude-3.5-sonnet` | ✅ |
+| **Google** | `gemini-2.5-pro`, `gemini-2.5-flash` | ✅ |
 
-### Provider-Specific Model Names
-| Provider | Example Usage |
-|----------|---------------|
-| **OpenRouter** | `anthropic/claude-3.5-sonnet`, `openai/gpt-4o`, `google/gemini-2.5-pro` |
-| **Anthropic** | `claude-3-5-sonnet-20241022`, `claude-sonnet-4-20250514` |
-| **OpenAI** | `gpt-4o`, `gpt-4o-mini` |
-| **Google** | `gemini-2.5-pro`, `gemini-2.5-flash` |
+### Full Model Names
+You can also use full OpenRouter model names:
 
-> **✨ Key Feature**: Separate target model (what you optimize FOR) from optimizer model (what does the work). Same optimization strategy regardless of provider!
+| Family | Full Model Names |
+|--------|------------------|
+| **OpenAI** | `openai/gpt-4o`, `openai/gpt-4o-mini`, `openai/gpt-5` |
+| **Anthropic** | `anthropic/claude-3.5-sonnet`, `anthropic/claude-opus-4-20250514`, `anthropic/claude-sonnet-4-20250514` |
+| **Google** | `google/gemini-2.5-pro`, `google/gemini-2.5-flash` |
+
+> **✨ Key Feature**: PAGANS automatically detects the model family and applies the appropriate optimization strategy for optimal results!
 
 ## 📚 Examples
 
 See the `examples/` directory for complete working examples:
 
-### OpenAI GPT Example
+### Basic PAGANS Example
 ```bash
 # Set your OpenRouter API key (get one at https://openrouter.ai/)
 export OPENROUTER_API_KEY="your-openrouter-api-key-here"
 
-# Run the example
+# Run the basic example
 uv run examples/openai_example.py
 ```
 
-### Anthropic Claude Example
+### Model Family Examples
 ```bash
 # Set your OpenRouter API key (get one at https://openrouter.ai/)
 export OPENROUTER_API_KEY="your-openrouter-api-key-here"
 
-# Run the example
-uv run examples/anthropic_example.py
+# Run examples for different model families
+uv run examples/anthropic_example.py  # Claude models
+uv run examples/google_example.py    # Gemini models
 ```
 
-### Google Gemini Example
+### Advanced Examples
 ```bash
-# Set your OpenRouter API key (get one at https://openrouter.ai/)
-export OPENROUTER_API_KEY="your-openrouter-api-key-here"
-
-# Run the example
-uv run examples/google_example.py
-```
-
-### Simple Example
-```bash
-# Simple example showing the updated approach
-uv run examples/simple_example.py
+# Provider factory example (legacy)
+uv run examples/provider_factory_example.py
 ```
 
 ## 🔧 Advanced Usage
@@ -218,7 +225,7 @@ uv run examples/simple_example.py
 
 ```python
 import asyncio
-from pagans import PromptOptimizer
+from pagans import PAGANSOptimizer
 
 async def batch_optimize():
     prompts = [
@@ -227,10 +234,10 @@ async def batch_optimize():
         "Create a React component"
     ]
 
-    async with PromptOptimizer() as optimizer:
+    async with PAGANSOptimizer() as optimizer:
         results = await optimizer.optimize_multiple(
             prompts=prompts,
-            target_model="openai/gpt-4o",
+            target_model="gpt-4o",
             max_concurrent=3
         )
 
@@ -238,22 +245,22 @@ async def batch_optimize():
             print(f"Optimized: {result.optimized}")
 ```
 
-### Compare Across Models
+### Compare Across Model Families
 
 ```python
 import asyncio
-from pagans import PromptOptimizer
+from pagans import PAGANSOptimizer
 
 async def compare_models():
     prompt = "Write a function to reverse a string"
 
-    async with PromptOptimizer() as optimizer:
+    async with PAGANSOptimizer() as optimizer:
         results = await optimizer.compare_optimizations(
             prompt=prompt,
             target_models=[
-                ("gpt-4o", "openrouter"),
-                ("claude-3.5-sonnet", "openrouter"), 
-                ("gemini-2.5-pro", "openrouter")
+                "gpt-4o",           # OpenAI family
+                "claude-3.5-sonnet", # Anthropic family
+                "gemini-2.5-pro"     # Google family
             ]
         )
 
@@ -265,10 +272,10 @@ async def compare_models():
 
 ```python
 import asyncio
-from pagans import PromptOptimizer
+from pagans import PAGANSOptimizer
 
 async def custom_config():
-    optimizer = PromptOptimizer(
+    optimizer = PAGANSOptimizer(
         api_key="your-api-key",
         base_url="https://custom.openrouter.url",
         timeout=30.0,
@@ -278,7 +285,7 @@ async def custom_config():
 
     result = await optimizer.optimize(
         prompt="Your prompt here",
-        target_model="openai/gpt-4o"
+        target_model="gpt-4o"
     )
 
     await optimizer.close()
@@ -286,16 +293,16 @@ async def custom_config():
 
 ## 🏗️ API Reference
 
-### PromptOptimizer
+### PAGANSOptimizer
 
-#### `__init__(api_key=None, base_url=None, default_model=None, timeout=30.0, max_retries=3, retry_delay=1.0)`
+#### `__init__(api_key=None, base_url=None, optimizer_model=None, timeout=30.0, max_retries=3, retry_delay=1.0)`
 
-Initialize the PromptOptimizer.
+Initialize the PAGANSOptimizer.
 
 **Parameters:**
 - `api_key` (str, optional): OpenRouter API key
 - `base_url` (str, optional): OpenRouter base URL
-- `default_model` (str, optional): Default model for optimization
+- `optimizer_model` (str, optional): Model that does the optimization work
 - `timeout` (float): Request timeout in seconds
 - `max_retries` (int): Maximum number of retry attempts
 - `retry_delay` (float): Delay between retry attempts
@@ -332,6 +339,7 @@ Optimize multiple prompts concurrently.
 - `optimized` (str): Optimized prompt
 - `target_model` (str): Target model name
 - `target_family` (ModelFamily): Model family enum
+- `provider` (str, optional): Provider used (always OpenRouter)
 - `optimization_notes` (str, optional): Optimization notes
 - `tokens_used` (int, optional): Tokens used in optimization
 - `optimization_time` (float, optional): Time taken in seconds
@@ -341,7 +349,7 @@ Optimize multiple prompts concurrently.
 ### Environment Variables
 
 - `OPENROUTER_API_KEY`: Your OpenRouter API key (required)
-- `OPTIMIZER_MODEL`: The model that does the optimization work (optional)
+- `PAGANS_OPTIMIZER_MODEL`: The model that does the optimization work (optional)
 - `OPENROUTER_BASE_URL`: Custom OpenRouter base URL (optional)
 
 ### .env File Support
@@ -351,12 +359,12 @@ Create a `.env` file in your project root:
 ```env
 OPENROUTER_API_KEY=your-api-key-here
 OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-OPTIMIZER_MODEL=openai/gpt-4o-mini
+PAGANS_OPTIMIZER_MODEL=openai/gpt-4o-mini
 ```
 
 **Important Environment Variables:**
 - `OPENROUTER_API_KEY`: Your OpenRouter API key (required)
-- `OPTIMIZER_MODEL`: The model that does the optimization work (optional, defaults to `openai/gpt-4o-mini`)
+- `PAGANS_OPTIMIZER_MODEL`: The model that does the optimization work (optional, defaults to `openai/gpt-4o-mini`)
 - `OPENROUTER_BASE_URL`: Custom OpenRouter base URL (optional)
 
 ## 🧪 Testing
@@ -380,13 +388,13 @@ uv run pytest --cov=pagans --cov-report=html
 We're actively working on exciting new features! Here's what's on our roadmap:
 
 ### 🔥 **Coming Soon**
-1. **🔑 Multi-Provider API Support** - Direct integration with OpenAI, Anthropic, Google, and Groq APIs (no more OpenRouter dependency!)
-2. **🤖 Extended Model Families** - Support for Meta Llama, Mistral, Cohere, and Perplexity models
-3. **⚡ Advanced Caching** - Redis-based distributed caching with semantic similarity matching
+1. **🤖 Extended Model Families** - Support for Meta Llama, Mistral, Cohere, and Perplexity models via OpenRouter
+2. **⚡ Advanced Caching** - Redis-based distributed caching with semantic similarity matching
+3. **🎨 Custom Optimization Strategies** - Allow users to define their own optimization approaches
 
 ### 🎯 **Planned Features**
 - **🔄 A/B Testing Framework** - Compare optimization strategies and automatically select the best approach
-- **📊 Performance Analytics** - Track optimization success rates, cost savings, and performance metrics  
+- **📊 Performance Analytics** - Track optimization success rates, cost savings, and performance metrics
 - **🛠️ CLI Tool** - Command-line interface for batch processing and automation
 - **🌐 Web Dashboard** - Simple web UI for testing and managing optimizations
 - **🔌 Framework Integrations** - Native support for LangChain, LlamaIndex, and Haystack
