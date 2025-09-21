@@ -5,7 +5,7 @@ This module provides a registry system for managing model families,
 providers, and their relationships in an extensible way.
 """
 
-from typing import Dict, List, Set, Optional, Type, Any
+from typing import Dict, List, Set, Optional
 from dataclasses import dataclass
 
 from . import ModelFamily, Provider

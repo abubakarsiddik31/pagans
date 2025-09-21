@@ -11,7 +11,8 @@ from unittest.mock import AsyncMock, Mock, patch
 import httpx
 import pytest
 
-from src.pagans.client import OpenRouterClient
+from src.pagans.clients import OpenRouterClient
+from src.pagans.models import Provider
 from src.pagans.exceptions import PAGANSError
 
 
@@ -21,7 +22,8 @@ class TestPAGANSClientInitialization:
     def test_init_with_api_key(self):
         """Test initialization with API key."""
         api_key = "test-api-key"
-        client = OpenRouterClient(api_key=api_key)
+        config = {"api_key": api_key}
+        client = OpenRouterClient(provider=Provider.OPENROUTER, config=config)
 
         assert client.api_key == api_key
         assert client.base_url == "https://openrouter.ai/api/v1"
@@ -37,13 +39,14 @@ class TestPAGANSClientInitialization:
         max_retries = 5
         retry_delay = 2.0
 
-        client = OpenRouterClient(
-            api_key=api_key,
-            base_url=base_url,
-            timeout=timeout,
-            max_retries=max_retries,
-            retry_delay=retry_delay,
-        )
+        config = {
+            "api_key": api_key,
+            "base_url": base_url,
+            "timeout": timeout,
+            "max_retries": max_retries,
+            "retry_delay": retry_delay,
+        }
+        client = OpenRouterClient(provider=Provider.OPENROUTER, config=config)
 
         assert client.api_key == api_key
         assert client.base_url == base_url
@@ -54,14 +57,17 @@ class TestPAGANSClientInitialization:
     def test_init_without_api_key(self):
         """Test initialization without API key raises error."""
         with pytest.raises(ValueError, match="API key is required"):
-            OpenRouterClient(api_key=None)
+            config = {"api_key": None}
+            OpenRouterClient(provider=Provider.OPENROUTER, config=config)
 
         with pytest.raises(ValueError, match="API key is required"):
-            OpenRouterClient(api_key="")
+            config = {"api_key": ""}
+            OpenRouterClient(provider=Provider.OPENROUTER, config=config)
 
     def test_init_with_base_url_trailing_slash(self):
         """Test initialization with base URL that has trailing slash."""
-        client = OpenRouterClient(api_key="test", base_url="https://api.example.com/")
+        config = {"api_key": "test", "base_url": "https://api.example.com/"}
+        client = OpenRouterClient(provider=Provider.OPENROUTER, config=config)
         assert client.base_url == "https://api.example.com"
 
 
@@ -71,11 +77,12 @@ class TestPAGANSClientRequestHandling:
     @pytest.fixture
     def mock_client(self):
         """Create a mock client for testing."""
-        with patch("src.pagans.client.httpx.AsyncClient") as mock_httpx_class:
+        with patch("httpx.AsyncClient") as mock_httpx_class:
             mock_httpx = AsyncMock()
             mock_httpx_class.return_value = mock_httpx
 
-            client = OpenRouterClient(api_key="test-api-key")
+            config = {"api_key": "test-api-key"}
+            client = OpenRouterClient(provider=Provider.OPENROUTER, config=config)
             client.client = mock_httpx
 
             return client
@@ -280,11 +287,12 @@ class TestPAGANSClientRateLimiting:
     @pytest.fixture
     def mock_client(self):
         """Create a mock client for testing."""
-        with patch("src.pagans.client.httpx.AsyncClient") as mock_httpx_class:
+        with patch("httpx.AsyncClient") as mock_httpx_class:
             mock_httpx = AsyncMock()
             mock_httpx_class.return_value = mock_httpx
 
-            client = OpenRouterClient(api_key="test-api-key")
+            config = {"api_key": "test-api-key"}
+            client = OpenRouterClient(provider=Provider.OPENROUTER, config=config)
             client.client = mock_httpx
 
             return client
@@ -357,11 +365,12 @@ class TestPAGANSClientAPIMethods:
     @pytest.fixture
     def mock_client(self):
         """Create a mock client for testing."""
-        with patch("src.pagans.client.httpx.AsyncClient") as mock_httpx_class:
+        with patch("httpx.AsyncClient") as mock_httpx_class:
             mock_httpx = AsyncMock()
             mock_httpx_class.return_value = mock_httpx
 
-            client = OpenRouterClient(api_key="test-api-key")
+            config = {"api_key": "test-api-key"}
+            client = OpenRouterClient(provider=Provider.OPENROUTER, config=config)
             client.client = mock_httpx
 
             return client

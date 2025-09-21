@@ -11,6 +11,7 @@ import os
 from dotenv import load_dotenv
 
 from pagans import PAGANSOptimizer
+from pagans.models import Provider
 
 load_dotenv()
 

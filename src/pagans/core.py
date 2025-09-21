@@ -11,6 +11,7 @@ import os
 import time
 
 from .clients.openrouter import OpenRouterClient
+from .models import Provider
 from .constants import (
     DEFAULT_BASE_URL,
     DEFAULT_MAX_RETRIES,
@@ -24,8 +25,11 @@ from .constants import (
 from .exceptions import (
     PAGANSConfigurationError,
     PAGANSModelNotFoundError,
+    PAGANSNetworkError,
     PAGANSOpenRouterAPIError,
+    PAGANSOptimizerError,
     PAGANSError,
+    PAGANSTimeoutError,
 )
 from .models import (
     ModelFamily,
@@ -74,6 +78,9 @@ class PAGANSOptimizer:
             DEFAULT_PAGANS_OPTIMIZER_MODEL
         )
 
+        # For backward compatibility with tests
+        self.default_model = self.optimizer_model
+
         # Get API key from environment if not provided
         if api_key is None:
             api_key = os.getenv(ENV_OPENROUTER_API_KEY)
@@ -88,12 +95,16 @@ class PAGANSOptimizer:
             base_url = os.getenv(ENV_OPENROUTER_BASE_URL, DEFAULT_BASE_URL)
 
         # Create OpenRouter client directly
+        config = {
+            "api_key": api_key,
+            "base_url": base_url,
+            "timeout": timeout,
+            "max_retries": max_retries,
+            "retry_delay": retry_delay,
+        }
         self.client = OpenRouterClient(
-            api_key=api_key,
-            base_url=base_url,
-            timeout=timeout,
-            max_retries=max_retries,
-            retry_delay=retry_delay,
+            provider=Provider.OPENROUTER,
+            config=config,
         )
 
         self._optimization_cache: dict[str, OptimizationResult] = {}
@@ -175,7 +186,13 @@ class PAGANSOptimizer:
 
         except PAGANSOpenRouterAPIError as e:
             msg = f"Failed to optimize prompt: {e!s}"
-            raise PAGANSError(msg)
+            raise PAGANSOptimizerError(msg)
+        except PAGANSNetworkError as e:
+            msg = f"Network error during optimization: {e!s}"
+            raise PAGANSOptimizerError(msg)
+        except PAGANSTimeoutError as e:
+            msg = f"Timeout during optimization: {e!s}"
+            raise PAGANSOptimizerError(msg)
 
     async def optimize_multiple(
         self,
@@ -239,7 +256,7 @@ class PAGANSOptimizer:
 
         for model in target_models:
             if not is_supported_model(model):
-                raise ModelNotFoundError(model)
+                raise PAGANSModelNotFoundError(model)
 
         results = {}
         for model in target_models:
@@ -268,7 +285,7 @@ class PAGANSOptimizer:
             family = detect_model_family(model_name)
             return get_optimization_description(family.value)
         except ValueError as e:
-            raise ModelNotFoundError(str(e))
+            raise PAGANSModelNotFoundError(str(e))
 
     def is_model_supported(self, model_name: str) -> bool:
         """Check if a model is supported."""

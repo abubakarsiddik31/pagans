@@ -13,8 +13,9 @@ import pytest
 from src.pagans.core import PAGANSOptimizer
 from src.pagans.exceptions import (
     PAGANSError,
+    PAGANSNetworkError,
 )
-from src.pagans.models import ModelFamily, OptimizationResult
+from src.pagans.models import ModelFamily, OptimizationResult, Provider
 
 
 class TestExtremeInputHandling:
@@ -23,7 +24,7 @@ class TestExtremeInputHandling:
     @pytest.fixture
     def mock_client(self):
         """Create a mock client for testing."""
-        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.clients.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -118,7 +119,7 @@ class TestModelEdgeCases:
     @pytest.fixture
     def mock_client(self):
         """Create a mock client for testing."""
-        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.clients.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -130,7 +131,7 @@ class TestModelEdgeCases:
             from src.pagans.exceptions import PAGANSModelNotFoundError
             optimizer = PAGANSOptimizer(api_key="test-key")
 
-            with pytest.raises(ModelNotFoundError):
+            with pytest.raises(PAGANSModelNotFoundError):
                 asyncio.run(
                     optimizer.optimize(prompt="Test prompt", target_model="unknown/model-v123")
                 )
@@ -150,7 +151,7 @@ class TestModelEdgeCases:
             ]
 
             for model in special_models:
-                with pytest.raises(ModelNotFoundError):
+                with pytest.raises(PAGANSModelNotFoundError):
                     asyncio.run(
                         optimizer.optimize(prompt="Test prompt", target_model=model)
                     )
@@ -182,31 +183,40 @@ class TestConfigurationEdgeCases:
             # Very short timeout
             optimizer1 = PAGANSOptimizer(api_key="test-key", timeout=0.001)
             mock_client_class.assert_called_with(
-                api_key="test-key",
-                base_url="https://openrouter.ai/api/v1",
-                timeout=0.001,
-                max_retries=3,
-                retry_delay=1.0
+                provider=Provider.OPENROUTER,
+                config={
+                    "api_key": "test-key",
+                    "base_url": "https://openrouter.ai/api/v1",
+                    "timeout": 0.001,
+                    "max_retries": 3,
+                    "retry_delay": 1.0
+                }
             )
 
             # Very long timeout
             optimizer2 = PAGANSOptimizer(api_key="test-key", timeout=3600.0)
             mock_client_class.assert_called_with(
-                api_key="test-key",
-                base_url="https://openrouter.ai/api/v1",
-                timeout=3600.0,
-                max_retries=3,
-                retry_delay=1.0
+                provider=Provider.OPENROUTER,
+                config={
+                    "api_key": "test-key",
+                    "base_url": "https://openrouter.ai/api/v1",
+                    "timeout": 3600.0,
+                    "max_retries": 3,
+                    "retry_delay": 1.0
+                }
             )
 
             # Zero timeout (should handle gracefully)
             optimizer3 = PAGANSOptimizer(api_key="test-key", timeout=0.0)
             mock_client_class.assert_called_with(
-                api_key="test-key",
-                base_url="https://openrouter.ai/api/v1",
-                timeout=0.0,
-                max_retries=3,
-                retry_delay=1.0
+                provider=Provider.OPENROUTER,
+                config={
+                    "api_key": "test-key",
+                    "base_url": "https://openrouter.ai/api/v1",
+                    "timeout": 0.0,
+                    "max_retries": 3,
+                    "retry_delay": 1.0
+                }
             )
 
     def test_extreme_retry_values(self):
@@ -215,44 +225,60 @@ class TestConfigurationEdgeCases:
             # Zero retries
             optimizer1 = PAGANSOptimizer(api_key="test-key", max_retries=0)
             mock_client_class.assert_called_with(
-                api_key="test-key",
-                base_url="https://openrouter.ai/api/v1",
-                timeout=30.0,
-                max_retries=0,
-                retry_delay=1.0
+                provider=Provider.OPENROUTER,
+                config={
+                    "api_key": "test-key",
+                    "base_url": "https://openrouter.ai/api/v1",
+                    "timeout": 30.0,
+                    "max_retries": 0,
+                    "retry_delay": 1.0
+                }
             )
 
             # Very high retry count
             optimizer2 = PAGANSOptimizer(api_key="test-key", max_retries=100)
             mock_client_class.assert_called_with(
-                api_key="test-key",
-                base_url="https://openrouter.ai/api/v1",
-                timeout=30.0,
-                max_retries=100,
-                retry_delay=1.0
+                provider=Provider.OPENROUTER,
+                config={
+                    "api_key": "test-key",
+                    "base_url": "https://openrouter.ai/api/v1",
+                    "timeout": 30.0,
+                    "max_retries": 100,
+                    "retry_delay": 1.0
+                }
             )
 
     def test_extreme_concurrency_values(self):
         """Test handling of extreme concurrency values."""
         with patch("src.pagans.core.OpenRouterClient") as mock_client_class:
-            mock_client = AsyncMock()
-            mock_client_class.return_value = mock_client
-            mock_client.optimize_prompt.return_value = "Optimized"
-            mock_client.validate_model.return_value = True
+            with patch("httpx.AsyncClient") as mock_httpx_class:
+                mock_client = AsyncMock()
+                mock_client_class.return_value = mock_client
+                mock_client.optimize_prompt.return_value = "Optimized"
+                mock_client.validate_model.return_value = True
 
-            optimizer = PAGANSOptimizer(api_key="test-key")
+                # Mock the httpx client
+                mock_httpx = AsyncMock()
+                mock_httpx_class.return_value = mock_httpx
+                mock_httpx.request.return_value = AsyncMock()
+                mock_httpx.request.return_value.status_code = 200
+                mock_httpx.request.return_value.json.return_value = {
+                    "choices": [{"message": {"content": "Optimized"}}]
+                }
 
-            # Test with very high concurrency
-            prompts = ["Test"] * 10
-            results = asyncio.run(
-                optimizer.optimize_multiple(
-                    prompts=prompts,
-                    target_model="openai/gpt-4o",
-                    max_concurrent=100,  # Very high concurrency
+                optimizer = PAGANSOptimizer(api_key="test-key")
+
+                # Test with very high concurrency
+                prompts = ["Test"] * 10
+                results = asyncio.run(
+                    optimizer.optimize_multiple(
+                        prompts=prompts,
+                        target_model="openai/gpt-4o",
+                        max_concurrent=100,  # Very high concurrency
+                    )
                 )
-            )
 
-            assert len(results) == 10
+                assert len(results) == 10
 
     def test_malformed_urls(self):
         """Test handling of malformed URLs."""
@@ -281,7 +307,7 @@ class TestBatchProcessingEdgeCases:
     @pytest.fixture
     def mock_client(self):
         """Create a mock client for testing."""
-        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.clients.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -361,7 +387,7 @@ class TestErrorRecoveryEdgeCases:
     @pytest.fixture
     def failing_client(self):
         """Create a mock client that can simulate various failures."""
-        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.clients.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 
@@ -380,9 +406,7 @@ class TestErrorRecoveryEdgeCases:
                 call_count += 1
 
                 if call_count % 3 == 0:  # Every third call fails
-                    from src.pagans.exceptions import NetworkError
-
-                    raise NetworkError("Intermittent failure")
+                    raise PAGANSNetworkError("Intermittent failure")
 
                 return f"Optimized {call_count}"
 
@@ -407,9 +431,7 @@ class TestErrorRecoveryEdgeCases:
 
             # Simulate complete network failure
             async def network_failure(*args, **kwargs):
-                from src.pagans.exceptions import NetworkError
-
-                raise NetworkError("Network partition")
+                raise PAGANSNetworkError("Network partition")
 
             failing_client.optimize_prompt = network_failure
             failing_client.validate_model.return_value = True
@@ -471,7 +493,7 @@ class TestDataIntegrity:
     @pytest.fixture
     def mock_client(self):
         """Create a mock client for testing."""
-        with patch("src.pagans.client.OpenRouterClient") as mock_client_class:
+        with patch("src.pagans.clients.OpenRouterClient") as mock_client_class:
             mock_client = AsyncMock()
             mock_client_class.return_value = mock_client
 

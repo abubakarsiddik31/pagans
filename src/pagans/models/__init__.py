@@ -6,7 +6,6 @@ and data structures for optimization requests and results.
 """
 
 # Import from the models.py file directly to avoid circular imports
-# Use a try/except to handle the circular import issue
 try:
     from ..models import (
         ModelFamily,
@@ -18,6 +17,8 @@ try:
         get_model_family_models,
         get_family_models,
         resolve_model_and_provider,
+        FAMILY_MODEL_MAPPINGS,
+        MODEL_NAME_MAPPINGS,
     )
 except ImportError:
     # Fallback for circular import issues - define minimal classes locally
@@ -31,9 +32,6 @@ except ImportError:
 
     class Provider(Enum):
         OPENROUTER = "openrouter"
-        ANTHROPIC = "anthropic"
-        OPENAI = "openai"
-        GOOGLE = "google"
 
     @dataclass
     class OptimizationResult:
@@ -108,6 +106,14 @@ except ImportError:
 
     def get_provider_model_name(short_name: str, provider: Provider) -> str:
         return short_name
+
+    # Define fallback constants
+    MODEL_NAME_MAPPINGS: dict[str, ModelFamily] = {}
+    FAMILY_MODEL_MAPPINGS: dict[str, list[str]] = {
+        ModelFamily.OPENAI.value: ["gpt-4o", "gpt-4o-mini"],
+        ModelFamily.ANTHROPIC.value: ["claude-3.5-sonnet", "claude-opus-4"],
+        ModelFamily.GOOGLE.value: ["gemini-2.5-pro", "gemini-2.5-flash"],
+    }
 from .registry import (
     ModelFamilyInfo,
     ProviderInfo,
@@ -134,6 +140,9 @@ __all__ = [
     "get_supported_models_by_provider",
     "get_all_supported_providers",
     "get_provider_model_name",
+    # Model mappings
+    "FAMILY_MODEL_MAPPINGS",
+    "MODEL_NAME_MAPPINGS",
     # Registry components
     "ModelFamilyInfo",
     "ProviderInfo",

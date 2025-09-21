@@ -6,7 +6,6 @@ PAGANS can handle various load scenarios efficiently.
 """
 
 import asyncio
-import statistics
 import time
 from unittest.mock import AsyncMock, patch
 

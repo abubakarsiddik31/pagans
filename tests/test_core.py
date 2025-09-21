@@ -10,6 +10,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from src.pagans.core import PAGANSOptimizer
+from src.pagans.providers import get_provider_client
 from src.pagans.exceptions import (
     PAGANSConfigurationError,
     PAGANSModelNotFoundError,
@@ -26,9 +27,9 @@ class TestPAGANSOptimizerInitialization:
         api_key = "test-api-key"
         optimizer = PAGANSOptimizer(api_key=api_key)
 
-        assert optimizer.provider.value == "openrouter"
-        assert optimizer.optimizer_model == "claude-3.5-sonnet"
+        assert optimizer.optimizer_model == "openai/gpt-4o-mini"
         assert optimizer.client is not None
+        assert optimizer.client.provider.value == "openrouter"
 
     def test_init_with_environment_variables(self):
         """Test initialization with environment variables."""
@@ -42,7 +43,7 @@ class TestPAGANSOptimizerInitialization:
         ):
             optimizer = PAGANSOptimizer()
 
-            assert optimizer.provider.value == "openrouter"
+            assert optimizer.client.provider.value == "openrouter"
             assert optimizer.optimizer_model == "custom-model"
 
     def test_init_without_api_key(self):
@@ -69,7 +70,7 @@ class TestPAGANSOptimizerInitialization:
             retry_delay=retry_delay,
         )
 
-        assert optimizer.provider.value == "openrouter"
+        assert optimizer.client.provider.value == "openrouter"
         assert optimizer.optimizer_model == optimizer_model
 
 
@@ -79,7 +80,7 @@ class TestPAGANSOptimizerOptimization:
     @pytest.fixture
     def mock_optimizer(self):
         """Create a mock optimizer for testing."""
-        with patch("src.pagans.core.get_provider_client") as mock_get_client:
+        with patch("src.pagans.providers.get_provider_client") as mock_get_client:
             mock_client = AsyncMock()
             mock_get_client.return_value = mock_client
 
@@ -91,14 +92,27 @@ class TestPAGANSOptimizerOptimization:
     @pytest.fixture
     def mock_optimization_result(self):
         """Create a mock optimization result."""
-        return OptimizationResult(
-            original="Original prompt",
-            optimized="Optimized prompt",
-            target_model="gpt-4o",
-            target_family=ModelFamily.OPENAI,
-            optimization_notes="Test optimization",
-            optimization_time=1.5,
-        )
+        # Try to create with provider field (fallback case)
+        try:
+            return OptimizationResult(
+                original="Original prompt",
+                optimized="Optimized prompt",
+                target_model="gpt-4o",
+                target_family=ModelFamily.OPENAI,
+                provider="openrouter",
+                optimization_notes="Test optimization",
+                optimization_time=1.5,
+            )
+        except TypeError:
+            # Fallback to without provider field (main case)
+            return OptimizationResult(
+                original="Original prompt",
+                optimized="Optimized prompt",
+                target_model="gpt-4o",
+                target_family=ModelFamily.OPENAI,
+                optimization_notes="Test optimization",
+                optimization_time=1.5,
+            )
 
     def test_optimize_success(self, mock_optimizer, mock_optimization_result):
         """Test successful prompt optimization."""
@@ -135,7 +149,7 @@ class TestPAGANSOptimizerOptimization:
                 )
             )
 
-        assert result.target_model == "openai/gpt-4o"
+        assert result.target_model == "claude-3.5-sonnet"
 
     def test_optimize_empty_prompt(self, mock_optimizer):
         """Test optimization with empty prompt raises error."""

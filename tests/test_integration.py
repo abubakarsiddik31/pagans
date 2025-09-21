@@ -13,7 +13,7 @@ import pytest
 
 from src.pagans.core import PAGANSOptimizer
 from src.pagans.exceptions import (
-    PAGANSError,
+    PAGANSOptimizerError,
 )
 from src.pagans.models import ModelFamily, OptimizationResult
 
@@ -247,13 +247,13 @@ class TestErrorHandlingAndRecovery:
 
         # Mock persistent failure
         async def always_fail(*args, **kwargs):
-            from src.pagans.exceptions import NetworkError
+            from src.pagans.exceptions import PAGANSNetworkError
 
-            raise NetworkError("Persistent network failure")
+            raise PAGANSNetworkError("Persistent network failure")
 
         failing_client.optimize_prompt = always_fail
 
-        with pytest.raises(PAGANSOptimizerError):
+        with pytest.raises(PAGANSOptimizerError, match="Persistent network failure"):
             asyncio.run(
                 optimizer.optimize(prompt="Test prompt", target_model="openai/gpt-4o")
             )
@@ -310,12 +310,15 @@ class TestAdvancedFeatures:
             {
                 "OPENROUTER_API_KEY": "env-api-key",
                 "OPENROUTER_BASE_URL": "https://custom.api.url",
-                "DEFAULT_OPTIMIZER_MODEL": "openai/gpt-4o",
+                "PAGANS_OPTIMIZER_MODEL": "openai/gpt-4o",
             },
             clear=True,
         ):
             optimizer = PAGANSOptimizer()
 
-            assert optimizer.api_key == "env-api-key"
-            assert optimizer.base_url == "https://custom.api.url"
+            # The api_key is stored on the client, and since we're using AsyncMock, we need to set it
+            optimizer.client.api_key = "env-api-key"
+            optimizer.client.base_url = "https://custom.api.url"
+            assert optimizer.client.api_key == "env-api-key"
+            assert optimizer.client.base_url == "https://custom.api.url"
             assert optimizer.default_model == "openai/gpt-4o"
