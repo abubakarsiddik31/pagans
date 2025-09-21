@@ -31,8 +31,6 @@ DEFAULT_HEADERS = {
 FAMILY_OPENAI = "openai"
 FAMILY_ANTHROPIC = "anthropic"
 FAMILY_GOOGLE = "google"
-FAMILY_META = "meta"
-FAMILY_MISTRAL = "mistral"
 
 # Error messages
 ERROR_MESSAGES = {

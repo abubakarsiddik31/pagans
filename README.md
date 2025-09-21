@@ -2,7 +2,6 @@
 
 <div align="center">
   <img src="logo.png" alt="PAGANS Logo" width="200"/>
-</div>
 
 [![PyPI version](https://badge.fury.io/py/pagans.svg)](https://pypi.org/project/pagans/)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
@@ -14,6 +13,7 @@
 
 
 A comprehensive Python package for optimizing prompts across different LLM model families using OpenRouter API. PAGANS helps developers align their prompts with model-specific guidelines and normalization standards, ensuring optimal performance across OpenAI GPT, Anthropic Claude, and Google Gemini models.
+</div>
 
 ## ✨ Features
 

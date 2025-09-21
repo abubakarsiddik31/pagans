@@ -60,7 +60,7 @@ class OptimizationRequest:
 SHORT_MODEL_NAMES = {
     # OpenAI models
     "gpt-4o": ModelFamily.OPENAI,
-    "gpt-4o-mini": ModelFamily.OPENAI,
+    "gpt-4.1": ModelFamily.OPENAI,
     "gpt-5": ModelFamily.OPENAI,
     
     # Anthropic models  
@@ -68,7 +68,6 @@ SHORT_MODEL_NAMES = {
     "claude-opus-4.1": ModelFamily.ANTHROPIC,
     "claude-sonnet-4": ModelFamily.ANTHROPIC,
     "claude-sonnet-3.7": ModelFamily.ANTHROPIC,
-    "claude-3.5-sonnet": ModelFamily.ANTHROPIC,
     
     # Google models
     "gemini-2.5-pro": ModelFamily.GOOGLE,
@@ -118,7 +117,6 @@ PROVIDER_MODEL_MAPPINGS = {
     }
 }
 
-# Legacy support - keep old MODEL_MAPPINGS for backward compatibility
 MODEL_MAPPINGS: dict[ModelFamily, list[str]] = {
     ModelFamily.OPENAI: [
         "gpt-4o", "gpt-4o-mini", "gpt-5",
