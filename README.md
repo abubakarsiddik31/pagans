@@ -226,6 +226,15 @@ uv run examples/google_example.py    # Gemini models
 uv run examples/provider_factory_example.py
 ```
 
+### Notebook Example
+```bash
+# Launch Jupyter and open the quickstart notebook
+uv sync --dev
+uv run jupyter lab
+```
+
+Open: `notebooks/pagans_quickstart.ipynb`
+
 ## 🔧 Advanced Usage
 
 ### Batch Processing
@@ -421,7 +430,16 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 For detailed development guidelines, see [agents.md](agents.md).
 
+## 📦 Publishing
+
+PyPI publishing guide is available at:
+
+- [`docs/PYPI_PUBLISHING.md`](docs/PYPI_PUBLISHING.md)
+
+Automated publishing workflow:
+
+- [`.github/workflows/publish.yml`](.github/workflows/publish.yml)
+
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
