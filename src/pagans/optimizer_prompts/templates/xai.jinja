@@ -1,0 +1,22 @@
+{% extends "base.jinja" %}
+
+{% block family_specific_guidelines %}
+Optimize for xAI Grok text models with these principles:
+- Provide concrete task context (codebase, domain, constraints, success criteria).
+- Use explicit requirements instead of vague intent.
+- Prefer structured context sections (Markdown headings or XML tags) for long prompts.
+- Include expected output format and acceptance criteria.
+- Encourage iterative refinement when first output misses requirements.
+
+xAI-specific prompting guidance to apply:
+1. Supply the necessary context up front so Grok can focus on the right scope.
+2. Set explicit goals and requirements; avoid underspecified instructions.
+3. Refine prompts with feedback from previous outputs.
+4. For tool-heavy workflows, use native tool calling and clear system instructions.
+5. Keep prompt history stable when possible to maximize cache benefits.
+
+Model-specific notes:
+- Grok 4.20 Beta: flagship reasoning model with strong tool-use patterns.
+- Grok 4 / Grok 4 Fast: general-purpose and lower-latency options.
+- Grok Code Fast 1: optimized for coding and agentic tool workflows.
+{% endblock %}

@@ -9,12 +9,14 @@ from .anthropic import ANTHROPIC_OPTIMIZATION_PROMPT
 from .base import BaseOptimizationPrompt, OptimizationPromptManager
 from .google import GOOGLE_OPTIMIZATION_PROMPT
 from .openai import OPENAI_OPTIMIZATION_PROMPT
+from .xai import XAI_OPTIMIZATION_PROMPT
 
 _prompt_manager = OptimizationPromptManager()
 
 _prompt_manager.register_prompt("openai", OPENAI_OPTIMIZATION_PROMPT)
 _prompt_manager.register_prompt("anthropic", ANTHROPIC_OPTIMIZATION_PROMPT)
 _prompt_manager.register_prompt("google", GOOGLE_OPTIMIZATION_PROMPT)
+_prompt_manager.register_prompt("xai", XAI_OPTIMIZATION_PROMPT)
 
 
 def get_optimization_prompt(
@@ -67,6 +69,7 @@ __all__ = [
     "ANTHROPIC_OPTIMIZATION_PROMPT",
     "GOOGLE_OPTIMIZATION_PROMPT",
     "OPENAI_OPTIMIZATION_PROMPT",
+    "XAI_OPTIMIZATION_PROMPT",
     "BaseOptimizationPrompt",
     "OptimizationPromptManager",
     "get_optimization_description",

@@ -20,6 +20,7 @@ from src.pagans.optimizer_prompts.anthropic import (
 )
 from src.pagans.optimizer_prompts.google import GOOGLE_OPTIMIZATION_PROMPT
 from src.pagans.optimizer_prompts.openai import OPENAI_OPTIMIZATION_PROMPT
+from src.pagans.optimizer_prompts.xai import XAI_OPTIMIZATION_PROMPT
 
 
 class TestBaseOptimizationPrompt:
@@ -190,6 +191,17 @@ class TestFamilySpecificPrompts:
         assert "Test prompt" in prompt
         assert "Return ONLY the optimized prompt" in prompt
 
+    def test_xai_prompt_structure(self):
+        """Test that xAI prompt has correct structure."""
+        prompt = XAI_OPTIMIZATION_PROMPT.get_prompt(
+            original_prompt="Test prompt", target_model="grok-4.20-beta"
+        )
+
+        assert "xAI Grok text models" in prompt
+        assert "grok-4.20-beta" in prompt
+        assert "Test prompt" in prompt
+        assert "Return ONLY the optimized prompt" in prompt
+
     def test_openai_description(self):
         """Test that OpenAI description is correct."""
         description = OPENAI_OPTIMIZATION_PROMPT.get_description()
@@ -213,6 +225,14 @@ class TestFamilySpecificPrompts:
         assert isinstance(description, str)
         assert len(description) > 0
         assert "Google" in description
+
+    def test_xai_description(self):
+        """Test that xAI description is correct."""
+        description = XAI_OPTIMIZATION_PROMPT.get_description()
+
+        assert isinstance(description, str)
+        assert len(description) > 0
+        assert "xAI" in description
 
 
 class TestGlobalPromptFunctions:
@@ -255,6 +275,7 @@ class TestGlobalPromptFunctions:
         assert "openai" in result
         assert "anthropic" in result
         assert "google" in result
+        assert "xai" in result
 
 
 class TestPromptIntegration:
@@ -314,7 +335,7 @@ class TestPromptIntegration:
 
         # Test that the manager has all families registered
         families = get_supported_families()
-        assert len(families) >= 3  # Should have at least 3 families (OpenAI, Anthropic, Google)
+        assert len(families) >= 4  # Should include OpenAI, Anthropic, Google, and xAI
 
     def test_prompt_parameter_substitution(self):
         """Test that prompt parameters are properly substituted."""

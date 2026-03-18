@@ -29,15 +29,14 @@ class GoogleOptimizationPrompt(BaseOptimizationPrompt):
     def get_description(self) -> str:
         """Get description of Google optimization approach."""
         return """
-        Optimization strategy for Google Gemini models focusing on:
-        - Clear, context-rich instructions with specific examples
-        - Well-structured formatting with proper organization
-        - Explicit task definition and expected output format
-        - Context setting and background information
-        - Examples that demonstrate the desired behavior
-        - Appropriate use of formatting and structure
+        Optimization strategy for Google Gemini text models focusing on:
+        - clear and specific instructions
+        - explicit constraints and response format
+        - structured examples for pattern-based tasks
+        - system instructions for tone and verbosity control
+        - iterative prompt refinement for reliability
 
-        Based on Google's official prompt engineering guide and best practices.
+        Based on Gemini prompt design strategies and model guidance.
         """
 
 

@@ -11,30 +11,29 @@ import os
 import time
 
 from .clients.openrouter import OpenRouterClient
-from .models import Provider
-from .providers import get_provider_client
 from .constants import (
     DEFAULT_BASE_URL,
     DEFAULT_MAX_RETRIES,
     DEFAULT_PAGANS_OPTIMIZER_MODEL,
     DEFAULT_RETRY_DELAY,
     DEFAULT_TIMEOUT,
-    ENV_PAGANS_OPTIMIZER_MODEL,
     ENV_OPENROUTER_API_KEY,
     ENV_OPENROUTER_BASE_URL,
+    ENV_PAGANS_OPTIMIZER_MODEL,
 )
 from .exceptions import (
     PAGANSConfigurationError,
+    PAGANSError,
     PAGANSModelNotFoundError,
     PAGANSNetworkError,
     PAGANSOpenRouterAPIError,
     PAGANSOptimizerError,
-    PAGANSError,
     PAGANSTimeoutError,
 )
 from .models import (
     ModelFamily,
     OptimizationResult,
+    Provider,
     detect_model_family,
     get_supported_models,
     is_supported_model,
@@ -43,6 +42,7 @@ from .optimizer_prompts import (
     get_optimization_description,
     get_optimization_prompt,
 )
+from .providers import get_provider_client
 
 
 class PAGANSOptimizer:
@@ -89,9 +89,12 @@ class PAGANSOptimizer:
         if api_key is None:
             api_key = os.getenv(ENV_OPENROUTER_API_KEY)
             if api_key is None:
-                raise PAGANSConfigurationError(
+                msg = (
                     "OpenRouter API key is required. Set OPENROUTER_API_KEY environment variable "
                     "or pass api_key parameter."
+                )
+                raise PAGANSConfigurationError(
+                    msg
                 )
 
         # Get base URL from environment if not provided
@@ -179,7 +182,6 @@ class PAGANSOptimizer:
                 optimized=optimized_prompt,
                 target_model=target_model,  # What we optimized FOR
                 target_family=target_family,
-                provider=None,  # No longer tracking provider since we only use OpenRouter
                 optimization_notes=optimization_notes,
                 optimization_time=optimization_time,
             )

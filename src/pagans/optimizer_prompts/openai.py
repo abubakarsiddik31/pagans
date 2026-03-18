@@ -29,15 +29,13 @@ class OpenAIOptimizationPrompt(BaseOptimizationPrompt):
     def get_description(self) -> str:
         """Get description of OpenAI optimization approach."""
         return """
-        Optimization strategy for OpenAI GPT models focusing on:
-        - Clear, direct instructions with specific action verbs
-        - Step-by-step breakdowns for complex tasks
-        - Well-structured formatting with headers, bullet points, and code blocks
-        - Context setting at the beginning of the prompt
-        - Examples when helpful for demonstrating expected output
-        - Avoiding overly verbose or ambiguous language
+        Optimization strategy for OpenAI GPT text models focusing on:
+        - explicit goals, constraints, and output contract
+        - structured instructions for multi-step tasks
+        - precise format guidance (schema/sections/style)
+        - examples when output consistency is required
 
-        Based on OpenAI's official prompt engineering guide and community best practices.
+        Based on OpenAI's latest model and reasoning prompt guidance.
         """
 
 

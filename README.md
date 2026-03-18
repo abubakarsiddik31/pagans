@@ -18,7 +18,7 @@
 ## ✨ Features
 
 - 🚀 **Fast Optimization**: Optimize prompts in under 10 seconds
-- 🎯 **Model Family Optimization**: Specialized optimization strategies for OpenAI, Anthropic, and Google model families
+- 🎯 **Model Family Optimization**: Specialized optimization strategies for OpenAI, Anthropic, xAI Grok, and Google model families
 - 🔗 **OpenRouter Integration**: Seamless integration with OpenRouter for access to all major model families
 - 🔄 **Async Support**: Full asynchronous API for high-throughput optimization
 - 📊 **Performance Metrics**: Track optimization time and token usage
@@ -46,6 +46,11 @@
 - Leverages multimodal capabilities when available
 - Optimized for factual accuracy and research
 - Performs well with structured data and technical content
+
+### **xAI Models** (Grok Series)
+- Responds best to explicit goals, constraints, and concrete context
+- Strong performance for reasoning-heavy and agentic coding tasks
+- Benefits from structured prompt sections and iterative refinement
 
 **The optimization process automatically detects the target model family and applies the most effective strategies for that specific family, ensuring optimal performance across all supported models.**
 
@@ -175,18 +180,20 @@ Use these convenient short names with PAGANS:
 
 | Family | Short Names | Available via OpenRouter |
 |--------|-------------|-------------------------|
-| **OpenAI** | `gpt-4o`, `gpt-4o-mini`, `gpt-5` | ✅ |
-| **Anthropic** | `claude-opus-4`, `claude-opus-4.1`, `claude-sonnet-4`, `claude-sonnet-3.7`, `claude-3.5-sonnet` | ✅ |
-| **Google** | `gemini-2.5-pro`, `gemini-2.5-flash` | ✅ |
+| **OpenAI** | `gpt-5.4`, `gpt-5.4-pro`, `gpt-5-mini`, `gpt-5-nano`, `gpt-4.1`, `gpt-4o` | ✅ |
+| **Anthropic** | `claude-opus-4.6`, `claude-sonnet-4.6`, `claude-haiku-4.5`, `claude-opus-4.1`, `claude-sonnet-4` | ✅ |
+| **xAI** | `grok-4.20-beta`, `grok-4`, `grok-4-fast`, `grok-code-fast-1` | ✅ |
+| **Google** | `gemini-3.1-pro-preview`, `gemini-3-flash-preview`, `gemini-3.1-flash-lite-preview`, `gemini-2.5-pro`, `gemini-2.5-flash` | ✅ |
 
 ### Full Model Names
 You can also use full OpenRouter model names:
 
 | Family | Full Model Names |
 |--------|------------------|
-| **OpenAI** | `openai/gpt-4o`, `openai/gpt-4o-mini`, `openai/gpt-5` |
-| **Anthropic** | `anthropic/claude-3.5-sonnet`, `anthropic/claude-opus-4-20250514`, `anthropic/claude-sonnet-4-20250514` |
-| **Google** | `google/gemini-2.5-pro`, `google/gemini-2.5-flash` |
+| **OpenAI** | `openai/gpt-5.4`, `openai/gpt-5.4-pro`, `openai/gpt-5.4-mini`, `openai/gpt-5.4-nano`, `openai/gpt-4.1`, `openai/gpt-4o` |
+| **Anthropic** | `anthropic/claude-opus-4.6`, `anthropic/claude-sonnet-4.6`, `anthropic/claude-haiku-4.5`, `anthropic/claude-opus-4.1` |
+| **xAI** | `x-ai/grok-4.20-beta`, `x-ai/grok-4`, `x-ai/grok-4-fast`, `x-ai/grok-code-fast-1` |
+| **Google** | `google/gemini-3.1-pro-preview`, `google/gemini-3-flash-preview`, `google/gemini-3.1-flash-lite-preview`, `google/gemini-2.5-pro`, `google/gemini-2.5-flash` |
 
 > **✨ Key Feature**: PAGANS automatically detects the model family and applies the appropriate optimization strategy for optimal results!
 
@@ -417,5 +424,4 @@ For detailed development guidelines, see [agents.md](agents.md).
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 

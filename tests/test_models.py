@@ -27,12 +27,14 @@ class TestModelFamily:
         assert ModelFamily.OPENAI.value == "openai"
         assert ModelFamily.ANTHROPIC.value == "anthropic"
         assert ModelFamily.GOOGLE.value == "google"
+        assert ModelFamily.XAI.value == "xai"
 
     def test_model_family_names(self):
         """Test that ModelFamily enum has correct names."""
         assert ModelFamily.OPENAI.name == "OPENAI"
         assert ModelFamily.ANTHROPIC.name == "ANTHROPIC"
         assert ModelFamily.GOOGLE.name == "GOOGLE"
+        assert ModelFamily.XAI.name == "XAI"
 
 
 class TestOptimizationResult:
@@ -137,14 +139,19 @@ class TestModelDetection:
 
     def test_detect_anthropic_models(self):
         """Test detection of Anthropic models."""
-        assert detect_model_family("claude-4") == ModelFamily.ANTHROPIC
-        assert detect_model_family("claude-4.1") == ModelFamily.ANTHROPIC
-        assert detect_model_family("claude-3.7-sonnet") == ModelFamily.ANTHROPIC
+        assert detect_model_family("claude-opus-4.6") == ModelFamily.ANTHROPIC
+        assert detect_model_family("claude-sonnet-4.6") == ModelFamily.ANTHROPIC
+        assert detect_model_family("claude-haiku-4.5") == ModelFamily.ANTHROPIC
 
     def test_detect_google_models(self):
         """Test detection of Google models."""
         assert detect_model_family("gemini-2.5-pro") == ModelFamily.GOOGLE
         assert detect_model_family("gemini-2.5-flash") == ModelFamily.GOOGLE
+
+    def test_detect_xai_models(self):
+        """Test detection of xAI Grok models."""
+        assert detect_model_family("grok-4.20-beta") == ModelFamily.XAI
+        assert detect_model_family("grok-4-fast") == ModelFamily.XAI
 
 
     def test_detect_invalid_model(self):
@@ -173,11 +180,13 @@ class TestModelSupport:
         assert is_supported_model("gpt-4o")
         assert is_supported_model("gpt-4.1")
         assert is_supported_model("gpt-5")
-        assert is_supported_model("claude-3.7-sonnet")
-        assert is_supported_model("claude-4")
-        assert is_supported_model("claude-4.1")
+        assert is_supported_model("claude-opus-4.6")
+        assert is_supported_model("claude-sonnet-4.6")
+        assert is_supported_model("claude-haiku-4.5")
         assert is_supported_model("gemini-2.5-pro")
         assert is_supported_model("gemini-2.5-flash")
+        assert is_supported_model("grok-4.20-beta")
+        assert is_supported_model("grok-4-fast")
 
     def test_is_supported_model_false(self):
         """Test that unsupported models return False."""
@@ -192,6 +201,7 @@ class TestModelSupport:
         assert ModelFamily.OPENAI in supported_models
         assert ModelFamily.ANTHROPIC in supported_models
         assert ModelFamily.GOOGLE in supported_models
+        assert ModelFamily.XAI in supported_models
 
         # Check that each family has models
         for family, models in supported_models.items():
@@ -219,6 +229,7 @@ class TestModelSupport:
         assert ModelFamily.OPENAI.value in FAMILY_MODEL_MAPPINGS
         assert ModelFamily.ANTHROPIC.value in FAMILY_MODEL_MAPPINGS
         assert ModelFamily.GOOGLE.value in FAMILY_MODEL_MAPPINGS
+        assert ModelFamily.XAI.value in FAMILY_MODEL_MAPPINGS
 
         # Check that each family has a list of models
         for family, models in FAMILY_MODEL_MAPPINGS.items():
@@ -249,14 +260,16 @@ class TestEdgeCases:
         """Test that model detection is case insensitive."""
         # These should all work regardless of case
         assert is_supported_model("GPT-4O")
-        assert is_supported_model("CLAUDE-3.7-SONNET")
+        assert is_supported_model("CLAUDE-SONNET-4.6")
         assert is_supported_model("GEMINI-2.5-PRO")
         assert is_supported_model("GEMINI-2.5-FLASH")
+        assert is_supported_model("GROK-4.20-BETA")
 
     def test_whitespace_handling(self):
         """Test that model detection handles whitespace."""
         # These should all work with whitespace
         assert is_supported_model(" gpt-4o ")
-        assert is_supported_model("  claude-3.7-sonnet  ")
+        assert is_supported_model("  claude-sonnet-4.6  ")
         assert is_supported_model("  gemini-2.5-pro  ")
         assert is_supported_model("  gemini-2.5-flash  ")
+        assert is_supported_model("  grok-4-fast  ")
