@@ -35,7 +35,7 @@ class OpenAIOptimizationPrompt(BaseOptimizationPrompt):
         - precise format guidance (schema/sections/style)
         - examples when output consistency is required
 
-        Based on OpenAI's latest model and reasoning prompt guidance.
+        Based on OpenAI's latest GPT and reasoning prompt guidance.
         """
 
 

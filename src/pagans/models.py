@@ -56,6 +56,10 @@ class OptimizationRequest:
 # Short names users can pass to PAGANS.
 SHORT_MODEL_NAMES: dict[str, ModelFamily] = {
     # OpenAI (latest + backward-compatible aliases)
+    "gpt-5.2": ModelFamily.OPENAI,
+    "gpt-5.2-mini": ModelFamily.OPENAI,
+    "gpt-5.2-nano": ModelFamily.OPENAI,
+    "gpt-5.1": ModelFamily.OPENAI,
     "gpt-5.4": ModelFamily.OPENAI,
     "gpt-5.4-pro": ModelFamily.OPENAI,
     "gpt-5.4-mini": ModelFamily.OPENAI,
@@ -67,6 +71,12 @@ SHORT_MODEL_NAMES: dict[str, ModelFamily] = {
     "gpt-4o": ModelFamily.OPENAI,
 
     # Anthropic (latest + backward-compatible aliases)
+    "claude-opus-4-20250514": ModelFamily.ANTHROPIC,
+    "claude-sonnet-4-20250514": ModelFamily.ANTHROPIC,
+    "claude-opus-4-1-20250805": ModelFamily.ANTHROPIC,
+    "claude-sonnet-4-5-20250929": ModelFamily.ANTHROPIC,
+    "claude-haiku-4-5-20251001": ModelFamily.ANTHROPIC,
+    "claude-3-7-sonnet-20250219": ModelFamily.ANTHROPIC,
     "claude-opus-4.6": ModelFamily.ANTHROPIC,
     "claude-sonnet-4.6": ModelFamily.ANTHROPIC,
     "claude-haiku-4.5": ModelFamily.ANTHROPIC,
@@ -76,6 +86,9 @@ SHORT_MODEL_NAMES: dict[str, ModelFamily] = {
     "claude-3.5-sonnet": ModelFamily.ANTHROPIC,
 
     # Google Gemini (latest text models + stable line)
+    "gemini-2.5-flash-lite": ModelFamily.GOOGLE,
+    "gemini-2.5-flash-lite-preview-09-2025": ModelFamily.GOOGLE,
+    "gemini-2.0-flash": ModelFamily.GOOGLE,
     "gemini-3.1-pro-preview": ModelFamily.GOOGLE,
     "gemini-3-flash-preview": ModelFamily.GOOGLE,
     "gemini-3.1-flash-lite-preview": ModelFamily.GOOGLE,
@@ -83,6 +96,10 @@ SHORT_MODEL_NAMES: dict[str, ModelFamily] = {
     "gemini-2.5-flash": ModelFamily.GOOGLE,
 
     # xAI Grok (text models)
+    "grok-4-1-fast-reasoning": ModelFamily.XAI,
+    "grok-4-1-fast-non-reasoning": ModelFamily.XAI,
+    "grok-4-fast-reasoning": ModelFamily.XAI,
+    "grok-4-fast-non-reasoning": ModelFamily.XAI,
     "grok-4.20-beta": ModelFamily.XAI,
     "grok-4.20-multi-agent-beta": ModelFamily.XAI,
     "grok-4": ModelFamily.XAI,
@@ -94,6 +111,10 @@ SHORT_MODEL_NAMES: dict[str, ModelFamily] = {
 # OpenRouter routed model ids.
 OPENROUTER_MODEL_MAPPINGS: dict[str, str] = {
     # OpenAI
+    "gpt-5.2": "openai/gpt-5.2",
+    "gpt-5.2-mini": "openai/gpt-5.2-mini",
+    "gpt-5.2-nano": "openai/gpt-5.2-nano",
+    "gpt-5.1": "openai/gpt-5.1",
     "gpt-5.4": "openai/gpt-5.4",
     "gpt-5.4-pro": "openai/gpt-5.4-pro",
     "gpt-5.4-mini": "openai/gpt-5.4-mini",
@@ -105,6 +126,12 @@ OPENROUTER_MODEL_MAPPINGS: dict[str, str] = {
     "gpt-4o": "openai/gpt-4o",
 
     # Anthropic
+    "claude-opus-4-20250514": "anthropic/claude-opus-4-20250514",
+    "claude-sonnet-4-20250514": "anthropic/claude-sonnet-4-20250514",
+    "claude-opus-4-1-20250805": "anthropic/claude-opus-4-1-20250805",
+    "claude-sonnet-4-5-20250929": "anthropic/claude-sonnet-4-5-20250929",
+    "claude-haiku-4-5-20251001": "anthropic/claude-haiku-4-5-20251001",
+    "claude-3-7-sonnet-20250219": "anthropic/claude-3-7-sonnet-20250219",
     "claude-opus-4.6": "anthropic/claude-opus-4.6",
     "claude-sonnet-4.6": "anthropic/claude-sonnet-4.6",
     "claude-haiku-4.5": "anthropic/claude-haiku-4.5",
@@ -114,6 +141,9 @@ OPENROUTER_MODEL_MAPPINGS: dict[str, str] = {
     "claude-3.5-sonnet": "anthropic/claude-3.5-sonnet",
 
     # Google
+    "gemini-2.5-flash-lite": "google/gemini-2.5-flash-lite",
+    "gemini-2.5-flash-lite-preview-09-2025": "google/gemini-2.5-flash-lite-preview-09-2025",
+    "gemini-2.0-flash": "google/gemini-2.0-flash",
     "gemini-3.1-pro-preview": "google/gemini-3.1-pro-preview",
     "gemini-3-flash-preview": "google/gemini-3-flash-preview",
     "gemini-3.1-flash-lite-preview": "google/gemini-3.1-flash-lite-preview",
@@ -121,6 +151,10 @@ OPENROUTER_MODEL_MAPPINGS: dict[str, str] = {
     "gemini-2.5-flash": "google/gemini-2.5-flash",
 
     # xAI
+    "grok-4-1-fast-reasoning": "x-ai/grok-4-1-fast-reasoning",
+    "grok-4-1-fast-non-reasoning": "x-ai/grok-4-1-fast-non-reasoning",
+    "grok-4-fast-reasoning": "x-ai/grok-4-fast-reasoning",
+    "grok-4-fast-non-reasoning": "x-ai/grok-4-fast-non-reasoning",
     "grok-4.20-beta": "x-ai/grok-4.20-beta",
     "grok-4.20-multi-agent-beta": "x-ai/grok-4.20-multi-agent-beta",
     "grok-4": "x-ai/grok-4",
@@ -131,6 +165,10 @@ OPENROUTER_MODEL_MAPPINGS: dict[str, str] = {
 
 MODEL_MAPPINGS: dict[ModelFamily, list[str]] = {
     ModelFamily.OPENAI: [
+        "gpt-5.2",
+        "gpt-5.2-mini",
+        "gpt-5.2-nano",
+        "gpt-5.1",
         "gpt-5.4",
         "gpt-5.4-pro",
         "gpt-5.4-mini",
@@ -140,6 +178,10 @@ MODEL_MAPPINGS: dict[ModelFamily, list[str]] = {
         "gpt-5",
         "gpt-4.1",
         "gpt-4o",
+        "openai/gpt-5.2",
+        "openai/gpt-5.2-mini",
+        "openai/gpt-5.2-nano",
+        "openai/gpt-5.1",
         "openai/gpt-5.4",
         "openai/gpt-5.4-pro",
         "openai/gpt-5.4-mini",
@@ -149,6 +191,12 @@ MODEL_MAPPINGS: dict[ModelFamily, list[str]] = {
         "openai/gpt-4o",
     ],
     ModelFamily.ANTHROPIC: [
+        "claude-opus-4-20250514",
+        "claude-sonnet-4-20250514",
+        "claude-opus-4-1-20250805",
+        "claude-sonnet-4-5-20250929",
+        "claude-haiku-4-5-20251001",
+        "claude-3-7-sonnet-20250219",
         "claude-opus-4.6",
         "claude-sonnet-4.6",
         "claude-haiku-4.5",
@@ -156,6 +204,12 @@ MODEL_MAPPINGS: dict[ModelFamily, list[str]] = {
         "claude-opus-4",
         "claude-sonnet-4",
         "claude-3.5-sonnet",
+        "anthropic/claude-opus-4-20250514",
+        "anthropic/claude-sonnet-4-20250514",
+        "anthropic/claude-opus-4-1-20250805",
+        "anthropic/claude-sonnet-4-5-20250929",
+        "anthropic/claude-haiku-4-5-20251001",
+        "anthropic/claude-3-7-sonnet-20250219",
         "anthropic/claude-opus-4.6",
         "anthropic/claude-sonnet-4.6",
         "anthropic/claude-haiku-4.5",
@@ -165,11 +219,17 @@ MODEL_MAPPINGS: dict[ModelFamily, list[str]] = {
         "anthropic/claude-3.5-sonnet",
     ],
     ModelFamily.GOOGLE: [
+        "gemini-2.5-flash-lite",
+        "gemini-2.5-flash-lite-preview-09-2025",
+        "gemini-2.0-flash",
         "gemini-3.1-pro-preview",
         "gemini-3-flash-preview",
         "gemini-3.1-flash-lite-preview",
         "gemini-2.5-pro",
         "gemini-2.5-flash",
+        "google/gemini-2.5-flash-lite",
+        "google/gemini-2.5-flash-lite-preview-09-2025",
+        "google/gemini-2.0-flash",
         "google/gemini-3.1-pro-preview",
         "google/gemini-3-flash-preview",
         "google/gemini-3.1-flash-lite-preview",
@@ -177,11 +237,19 @@ MODEL_MAPPINGS: dict[ModelFamily, list[str]] = {
         "google/gemini-2.5-flash",
     ],
     ModelFamily.XAI: [
+        "grok-4-1-fast-reasoning",
+        "grok-4-1-fast-non-reasoning",
+        "grok-4-fast-reasoning",
+        "grok-4-fast-non-reasoning",
         "grok-4.20-beta",
         "grok-4.20-multi-agent-beta",
         "grok-4",
         "grok-4-fast",
         "grok-code-fast-1",
+        "x-ai/grok-4-1-fast-reasoning",
+        "x-ai/grok-4-1-fast-non-reasoning",
+        "x-ai/grok-4-fast-reasoning",
+        "x-ai/grok-4-fast-non-reasoning",
         "x-ai/grok-4.20-beta",
         "x-ai/grok-4.20-multi-agent-beta",
         "x-ai/grok-4",

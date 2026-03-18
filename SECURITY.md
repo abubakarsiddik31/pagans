@@ -13,7 +13,7 @@ Security fixes are applied to the latest released version.
 
 Please do not report security vulnerabilities in public GitHub issues.
 
-Send details to: **security@pagans.dev**
+Send details to: **abubakar1808031@gmail.com**
 
 Include:
 

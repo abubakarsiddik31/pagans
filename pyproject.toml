@@ -27,10 +27,10 @@ keywords = [
     "artificial-intelligence"
 ]
 authors = [
-    {name = "PAGANS Team", email = "contact@pagans.dev"}
+    {name = "PAGANS Team", email = "abubakar1808031@gmail.com"}
 ]
 maintainers = [
-    {name = "PAGANS Team", email = "contact@pagans.dev"}
+    {name = "PAGANS Team", email = "abubakar1808031@gmail.com"}
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",

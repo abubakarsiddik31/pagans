@@ -440,6 +440,7 @@ Quick flow:
 PyPI publishing guide is available at:
 
 - [`docs/PYPI_PUBLISHING.md`](docs/PYPI_PUBLISHING.md)
+- [`docs/TEXT_MODEL_GUIDANCE.md`](docs/TEXT_MODEL_GUIDANCE.md)
 
 Automated publishing workflow:
 

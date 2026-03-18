@@ -36,7 +36,7 @@ class AnthropicOptimizationPrompt(BaseOptimizationPrompt):
         - few-shot examples for consistency and steerability
         - explicit output format constraints
 
-        Based on Anthropic Claude 4.6 prompting best practices.
+        Based on Anthropic Claude prompt engineering best practices for Claude 4.x models.
         """
 
 

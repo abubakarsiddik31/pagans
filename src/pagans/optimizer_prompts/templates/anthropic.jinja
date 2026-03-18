@@ -16,7 +16,8 @@ Anthropic best-practice pattern:
 5. For long context tasks, keep documents structured and ground responses in quoted evidence.
 
 Model-specific notes:
-- Claude Opus 4.6: highest capability for complex reasoning/coding tasks.
-- Claude Sonnet 4.6: strong speed-intelligence balance for most production use.
-- Claude Haiku 4.5: fastest and most cost-efficient latest Claude tier.
+- Claude Opus 4.x date-suffixed IDs: primary highest-capability text tier.
+- Claude Sonnet 4.x date-suffixed IDs: primary speed-intelligence production tier.
+- Claude Haiku 4.x date-suffixed IDs: primary low-latency, low-cost text tier.
+- Prefer date-suffixed IDs (for example `claude-sonnet-4-20250514`) for reproducibility.
 {% endblock %}

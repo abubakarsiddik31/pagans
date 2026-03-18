@@ -161,46 +161,50 @@ class TestFamilySpecificPrompts:
     def test_openai_prompt_structure(self):
         """Test that OpenAI prompt has correct structure."""
         prompt = OPENAI_OPTIMIZATION_PROMPT.get_prompt(
-            original_prompt="Test prompt", target_model="gpt-4o"
+            original_prompt="Test prompt", target_model="gpt-5.4"
         )
 
         assert "OpenAI GPT models" in prompt
-        assert "gpt-4o" in prompt
+        assert "gpt-5.4" in prompt
         assert "Test prompt" in prompt
         assert "Return ONLY the optimized prompt" in prompt
+        assert "output schema/format clearly" in prompt
 
     def test_anthropic_prompt_structure(self):
         """Test that Anthropic prompt has correct structure."""
         prompt = ANTHROPIC_OPTIMIZATION_PROMPT.get_prompt(
-            original_prompt="Test prompt", target_model="claude-3.5-sonnet"
+            original_prompt="Test prompt", target_model="claude-sonnet-4-20250514"
         )
 
         assert "Anthropic Claude models" in prompt
-        assert "claude-3.5-sonnet" in prompt
+        assert "claude-sonnet-4-20250514" in prompt
         assert "Test prompt" in prompt
         assert "Return ONLY the optimized prompt" in prompt
+        assert "Use XML tags" in prompt
 
     def test_google_prompt_structure(self):
         """Test that Google prompt has correct structure."""
         prompt = GOOGLE_OPTIMIZATION_PROMPT.get_prompt(
-            original_prompt="Test prompt", target_model="gemini-1.5-pro"
+            original_prompt="Test prompt", target_model="gemini-3.1-pro-preview"
         )
 
         assert "Google Gemini models" in prompt
-        assert "gemini-1.5-pro" in prompt
+        assert "gemini-3.1-pro-preview" in prompt
         assert "Test prompt" in prompt
         assert "Return ONLY the optimized prompt" in prompt
+        assert "Gemini prompting strategy" in prompt
 
     def test_xai_prompt_structure(self):
         """Test that xAI prompt has correct structure."""
         prompt = XAI_OPTIMIZATION_PROMPT.get_prompt(
-            original_prompt="Test prompt", target_model="grok-4.20-beta"
+            original_prompt="Test prompt", target_model="grok-4-1-fast-reasoning"
         )
 
         assert "xAI Grok text models" in prompt
-        assert "grok-4.20-beta" in prompt
+        assert "grok-4-1-fast-reasoning" in prompt
         assert "Test prompt" in prompt
         assert "Return ONLY the optimized prompt" in prompt
+        assert "xAI-specific prompting guidance to apply" in prompt
 
     def test_openai_description(self):
         """Test that OpenAI description is correct."""

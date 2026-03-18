@@ -38,7 +38,7 @@ from .optimizer_prompts import (
 
 __version__ = "0.1.0"
 __author__ = "PAGANS Team"
-__email__ = "contact@pagans.dev"
+__email__ = "abubakar1808031@gmail.com"
 __description__ = (
     "Prompts Aligned to Guidelines and Normalization System - Optimize prompts across LLM model families using OpenRouter"
 )
