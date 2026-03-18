@@ -5,6 +5,9 @@ include CODE_OF_CONDUCT.md
 include CONTRIBUTING.md
 include SECURITY.md
 include SUPPORT.md
+include docs/CLI.md
+include docs/TEXT_MODEL_GUIDANCE.md
+include docs/PYPI_PUBLISHING.md
 include .env.example
 include logo.png
 

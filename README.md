@@ -235,6 +235,42 @@ uv run jupyter lab
 
 Open: `notebooks/pagans_quickstart.ipynb`
 
+## 🛠️ CLI Usage
+
+PAGANS includes a CLI installed as `pagans`.
+
+### Optimize One Prompt
+```bash
+pagans optimize \
+  --prompt "Write a robust retry policy for external API calls" \
+  --target-model gpt-5.4
+```
+
+### Compare Across Models
+```bash
+pagans compare \
+  --prompt "Design an event-driven architecture for order processing" \
+  --models "gpt-5.4,claude-sonnet-4-20250514,gemini-3.1-pro-preview,grok-4-1-fast-reasoning"
+```
+
+### Batch From File
+```bash
+pagans batch \
+  --prompts-file ./prompts.txt \
+  --target-model gemini-3.1-pro-preview \
+  --max-concurrent 5
+```
+
+### JSON Output
+```bash
+pagans optimize \
+  --prompt "Summarize this technical RFC" \
+  --target-model claude-opus-4-20250514 \
+  --json
+```
+
+For full CLI docs, see [`docs/CLI.md`](docs/CLI.md).
+
 ## 🔧 Advanced Usage
 
 ### Batch Processing
