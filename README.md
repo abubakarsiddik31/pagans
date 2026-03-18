@@ -420,15 +420,20 @@ Want to contribute to any of these features? Check out our [agents.md](agents.md
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome.
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- Contribution guide: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- Code of Conduct: [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)
+- Security policy: [`SECURITY.md`](SECURITY.md)
+- Support: [`SUPPORT.md`](SUPPORT.md)
+- Developer architecture notes: [`agents.md`](agents.md)
 
-For detailed development guidelines, see [agents.md](agents.md).
+Quick flow:
+
+1. Fork and clone the repository.
+2. Create a feature branch.
+3. Run tests and lint locally.
+4. Open a pull request with context and tests.
 
 ## 📦 Publishing
 

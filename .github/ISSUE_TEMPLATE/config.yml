@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability report
+    url: mailto:security@pagans.dev
+    about: Please report security issues privately via email.
+  - name: Support and questions
+    url: https://github.com/abubakarsiddik31/pagans/discussions
+    about: Use GitHub Discussions for usage and integration questions.
