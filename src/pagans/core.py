@@ -12,6 +12,7 @@ import time
 
 from .clients.openrouter import OpenRouterClient
 from .models import Provider
+from .providers import get_provider_client
 from .constants import (
     DEFAULT_BASE_URL,
     DEFAULT_MAX_RETRIES,
@@ -56,6 +57,7 @@ class PAGANSOptimizer:
         self,
         api_key: str | None = None,
         base_url: str | None = None,
+        provider: Provider = Provider.OPENROUTER,
         optimizer_model: str | None = None,
         timeout: float = DEFAULT_TIMEOUT,
         max_retries: int = DEFAULT_MAX_RETRIES,
@@ -67,11 +69,13 @@ class PAGANSOptimizer:
         Args:
             api_key: OpenRouter API key (if None, tries to get from environment)
             base_url: OpenRouter base URL (if None, tries to get from environment)
+            provider: Provider to use for optimization client
             optimizer_model: Model that does the optimization work (if None, uses env or default)
             timeout: Request timeout in seconds
             max_retries: Maximum number of retry attempts
             retry_delay: Delay between retry attempts in seconds
         """
+        self.provider = provider
 
         self.optimizer_model = optimizer_model or os.getenv(
             ENV_PAGANS_OPTIMIZER_MODEL,
@@ -94,7 +98,6 @@ class PAGANSOptimizer:
         if base_url is None:
             base_url = os.getenv(ENV_OPENROUTER_BASE_URL, DEFAULT_BASE_URL)
 
-        # Create OpenRouter client directly
         config = {
             "api_key": api_key,
             "base_url": base_url,
@@ -102,10 +105,12 @@ class PAGANSOptimizer:
             "max_retries": max_retries,
             "retry_delay": retry_delay,
         }
-        self.client = OpenRouterClient(
-            provider=Provider.OPENROUTER,
-            config=config,
-        )
+        # Backward-compatible OpenRouter path (used by existing tests and users),
+        # with factory fallback for non-OpenRouter providers.
+        if self.provider == Provider.OPENROUTER:
+            self.client = OpenRouterClient(provider=self.provider, config=config)
+        else:
+            self.client = get_provider_client(provider=self.provider, config=config)
 
         self._optimization_cache: dict[str, OptimizationResult] = {}
 

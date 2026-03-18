@@ -207,3 +207,8 @@ marimo/_lsp/
 __marimo__/
 
 .dev
+
+# Local planning/status reports
+NEXT_STEPS*.md
+REVAMP_STATUS_*.md
+PROJECT_STATUS_*.md
