@@ -107,6 +107,7 @@ where = ["src"]
 write_to = "src/pagans/_version.py"
 root = "."
 version_file = "src/pagans/__version__.py"
+local_scheme = "no-local-version"
 
 [tool.ruff]
 line-length = 88

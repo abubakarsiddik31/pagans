@@ -2,40 +2,21 @@ name: Publish to PyPI
 
 on:
   release:
-    types: [created]
-  push:
-    tags:
-      - "v*"
-  workflow_dispatch:
+    types: [published]
 
 jobs:
   publish:
+    if: github.event.release.target_commitish == 'main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
 
     steps:
-      - name: Checkout code
+      - name: Checkout release tag
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.release.tag_name }}
           fetch-depth: 0
-
-      - name: Get version from tag
-        id: get_version
-        run: |
-          if [ "${{ github.event_name }}" = "release" ]; then
-            echo "TAG=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event_name }}" = "push" ]; then
-            echo "TAG=${{ github.ref }}" >> $GITHUB_OUTPUT
-          else
-            echo "TAG=manual" >> $GITHUB_OUTPUT
-          fi
-          echo "Checking out tag: ${TAG}"
-
-      - name: Checkout exact tag
-        if: steps.get_version.outputs.TAG != 'manual'
-        run: |
-          git checkout ${{ steps.get_version.outputs.TAG }}
 
       - name: Install uv
         uses: astral-sh/setup-uv@v4
@@ -45,26 +26,34 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Derive version from tag
+        id: version
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          VERSION="${TAG#v}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Release tag: $TAG"
+          echo "Build version: $VERSION"
+
       - name: Install build dependencies
         run: uv sync --dev
 
       - name: Build package
+        env:
+          SETUPTOOLS_SCM_PRETEND_VERSION: ${{ steps.version.outputs.version }}
         run: uv run python -m build
 
       - name: Check package metadata
         run: uv run twine check dist/*
 
-      - name: Display package version
+      - name: Show built artifacts
         run: |
-          echo "📦 Built packages:"
+          echo "Built artifacts:"
           ls -lh dist/
-          echo ""
-          echo "📋 Package contents:"
-          tar -tzf dist/*.tar.gz | head -20
-          echo ""
-          echo "🔑 PyPI token status: Configured"
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
+          attestations: false
