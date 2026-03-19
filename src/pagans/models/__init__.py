@@ -65,7 +65,6 @@ SHORT_MODEL_NAMES: dict[str, ModelFamily] = {
     "gpt-5": ModelFamily.OPENAI,
     "gpt-4.1": ModelFamily.OPENAI,
     "gpt-4o": ModelFamily.OPENAI,
-
     # Anthropic (latest + backward-compatible aliases)
     "claude-opus-4.6": ModelFamily.ANTHROPIC,
     "claude-sonnet-4.6": ModelFamily.ANTHROPIC,
@@ -74,14 +73,12 @@ SHORT_MODEL_NAMES: dict[str, ModelFamily] = {
     "claude-opus-4": ModelFamily.ANTHROPIC,
     "claude-sonnet-4": ModelFamily.ANTHROPIC,
     "claude-3.5-sonnet": ModelFamily.ANTHROPIC,
-
     # Google Gemini (latest text models + stable line)
     "gemini-3.1-pro-preview": ModelFamily.GOOGLE,
     "gemini-3-flash-preview": ModelFamily.GOOGLE,
     "gemini-3.1-flash-lite-preview": ModelFamily.GOOGLE,
     "gemini-2.5-pro": ModelFamily.GOOGLE,
     "gemini-2.5-flash": ModelFamily.GOOGLE,
-
     # xAI Grok (text models)
     "grok-4.20-beta": ModelFamily.XAI,
     "grok-4.20-multi-agent-beta": ModelFamily.XAI,
@@ -103,7 +100,6 @@ OPENROUTER_MODEL_MAPPINGS: dict[str, str] = {
     "gpt-5": "openai/gpt-5",
     "gpt-4.1": "openai/gpt-4.1",
     "gpt-4o": "openai/gpt-4o",
-
     # Anthropic
     "claude-opus-4.6": "anthropic/claude-opus-4.6",
     "claude-sonnet-4.6": "anthropic/claude-sonnet-4.6",
@@ -112,14 +108,12 @@ OPENROUTER_MODEL_MAPPINGS: dict[str, str] = {
     "claude-opus-4": "anthropic/claude-opus-4",
     "claude-sonnet-4": "anthropic/claude-sonnet-4",
     "claude-3.5-sonnet": "anthropic/claude-3.5-sonnet",
-
     # Google
     "gemini-3.1-pro-preview": "google/gemini-3.1-pro-preview",
     "gemini-3-flash-preview": "google/gemini-3-flash-preview",
     "gemini-3.1-flash-lite-preview": "google/gemini-3.1-flash-lite-preview",
     "gemini-2.5-pro": "google/gemini-2.5-pro",
     "gemini-2.5-flash": "google/gemini-2.5-flash",
-
     # xAI
     "grok-4.20-beta": "x-ai/grok-4.20-beta",
     "grok-4.20-multi-agent-beta": "x-ai/grok-4.20-multi-agent-beta",
@@ -267,7 +261,9 @@ def resolve_model_and_provider(model_name: str) -> tuple[str, ModelFamily]:
         raise ValueError(f"Unknown model: {normalized}") from e
 
 
-def get_supported_models_by_provider(provider: Provider | str) -> dict[str, ModelFamily]:
+def get_supported_models_by_provider(
+    provider: Provider | str,
+) -> dict[str, ModelFamily]:
     """Return short model names supported by a provider."""
     if isinstance(provider, str):
         provider = Provider(provider.lower())
@@ -301,38 +297,37 @@ def get_provider_model_name(short_name: str, provider: Provider) -> str:
 
 from .registry import (
     ModelFamilyInfo,
-    ProviderInfo,
     ModelRegistry,
+    ProviderInfo,
+    get_model_family,
     get_model_registry,
+    is_model_supported,
     register_model_family,
     register_provider,
-    get_model_family,
-    is_model_supported,
 )
 
-
 __all__ = [
-    "ModelFamily",
-    "Provider",
-    "OptimizationResult",
-    "OptimizationRequest",
-    "detect_model_family",
-    "get_supported_models",
-    "is_supported_model",
-    "get_model_family_models",
-    "get_family_models",
-    "resolve_model_and_provider",
-    "get_supported_models_by_provider",
-    "get_all_supported_providers",
-    "get_provider_model_name",
     "FAMILY_MODEL_MAPPINGS",
     "MODEL_NAME_MAPPINGS",
+    "ModelFamily",
     "ModelFamilyInfo",
-    "ProviderInfo",
     "ModelRegistry",
+    "OptimizationRequest",
+    "OptimizationResult",
+    "Provider",
+    "ProviderInfo",
+    "detect_model_family",
+    "get_all_supported_providers",
+    "get_family_models",
+    "get_model_family",
+    "get_model_family_models",
     "get_model_registry",
+    "get_provider_model_name",
+    "get_supported_models",
+    "get_supported_models_by_provider",
+    "is_model_supported",
+    "is_supported_model",
     "register_model_family",
     "register_provider",
-    "get_model_family",
-    "is_model_supported",
+    "resolve_model_and_provider",
 ]

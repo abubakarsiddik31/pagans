@@ -6,25 +6,25 @@ for different LLM providers.
 """
 
 import os
-from typing import Dict, Any, Optional, Union
 from dataclasses import dataclass, field
+from typing import Any
 
-from ..models import Provider
 from ..exceptions import PAGANSConfigurationError
+from ..models import Provider
 
 
 @dataclass
 class ProviderConfig:
     """Configuration for a specific provider."""
 
-    api_key: Optional[str] = None
-    base_url: Optional[str] = None
+    api_key: str | None = None
+    base_url: str | None = None
     timeout: float = 30.0
     max_retries: int = 3
     retry_delay: float = 1.0
-    additional_headers: Dict[str, str] = field(default_factory=dict)
-    models: Dict[str, str] = field(default_factory=dict)
-    rate_limits: Dict[str, Union[int, float]] = field(default_factory=dict)
+    additional_headers: dict[str, str] = field(default_factory=dict)
+    models: dict[str, str] = field(default_factory=dict)
+    rate_limits: dict[str, int | float] = field(default_factory=dict)
 
     def validate(self) -> None:
         """Validate the configuration."""
@@ -51,8 +51,8 @@ class ConfigManager:
 
     def __init__(self):
         """Initialize the configuration manager."""
-        self._configs: Dict[Provider, ProviderConfig] = {}
-        self._default_configs: Dict[Provider, Dict[str, Any]] = {
+        self._configs: dict[Provider, ProviderConfig] = {}
+        self._default_configs: dict[Provider, dict[str, Any]] = {
             Provider.OPENROUTER: {
                 "base_url": "https://openrouter.ai/api/v1",
                 "timeout": 30.0,
@@ -115,7 +115,9 @@ class ConfigManager:
 
         return config
 
-    def get_config(self, provider: Provider, overrides: Optional[Dict[str, Any]] = None) -> ProviderConfig:
+    def get_config(
+        self, provider: Provider, overrides: dict[str, Any] | None = None
+    ) -> ProviderConfig:
         """
         Get configuration for a provider.
 
@@ -151,7 +153,7 @@ class ConfigManager:
         config.validate()
         self._configs[provider] = config
 
-    def get_all_configs(self) -> Dict[Provider, ProviderConfig]:
+    def get_all_configs(self) -> dict[Provider, ProviderConfig]:
         """
         Get all configured providers and their configurations.
 
@@ -190,8 +192,7 @@ def get_config_manager() -> ConfigManager:
 
 
 def get_provider_config(
-    provider: Provider,
-    overrides: Optional[Dict[str, Any]] = None
+    provider: Provider, overrides: dict[str, Any] | None = None
 ) -> ProviderConfig:
     """
     Get configuration for a provider using the global configuration manager.

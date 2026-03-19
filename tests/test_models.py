@@ -7,12 +7,13 @@ and data structures for optimization requests and results.
 
 import pytest
 
-from src.pagans.models import FAMILY_MODEL_MAPPINGS, MODEL_NAME_MAPPINGS
 from src.pagans.models import (
+    FAMILY_MODEL_MAPPINGS,
+    MODEL_NAME_MAPPINGS,
     ModelFamily,
-    Provider,
     OptimizationRequest,
     OptimizationResult,
+    Provider,
     detect_model_family,
     get_supported_models,
     is_supported_model,
@@ -72,7 +73,7 @@ class TestOptimizationResult:
         assert result.optimization_time == 1.5
 
         # Check provider if it exists
-        if hasattr(result, 'provider'):
+        if hasattr(result, "provider"):
             assert result.provider == Provider.OPENROUTER
 
     def test_optimization_result_optional_fields(self):
@@ -99,7 +100,7 @@ class TestOptimizationResult:
         assert result.optimization_time is None
 
         # Check provider if it exists
-        if hasattr(result, 'provider'):
+        if hasattr(result, "provider"):
             assert result.provider == Provider.OPENROUTER
 
 
@@ -159,7 +160,6 @@ class TestModelDetection:
         assert detect_model_family("grok-4.20-beta") == ModelFamily.XAI
         assert detect_model_family("grok-4-fast") == ModelFamily.XAI
 
-
     def test_detect_invalid_model(self):
         """Test detection of invalid model names."""
         with pytest.raises(ValueError, match="Unknown model family"):
@@ -175,7 +175,7 @@ class TestModelDetection:
             assert isinstance(result, ModelFamily)
         except ValueError:
             # Fallback implementation raises ValueError for empty string
-            assert str("") in "Unknown model family for:"
+            assert "" in "Unknown model family for:"
 
 
 class TestModelSupport:
@@ -260,7 +260,7 @@ class TestEdgeCases:
             assert isinstance(result, ModelFamily)
         except ValueError:
             # Both main and fallback implementations raise ValueError for empty string
-            assert str("") in "Unknown model family for:"
+            assert "" in "Unknown model family for:"
 
     def test_none_detection(self):
         """Test detection with None."""

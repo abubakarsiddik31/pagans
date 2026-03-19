@@ -7,12 +7,18 @@ with proper error handling, rate limiting, and retry logic.
 
 import asyncio
 import time
-from typing import Any, Dict
+from typing import Any
 
 import httpx
 
-from .base import BaseClient
-from ..models import Provider
+from ..constants import (
+    API_VERSION,
+    CHAT_COMPLETIONS_ENDPOINT,
+    DEFAULT_HEADERS,
+    DEFAULT_MAX_RETRIES,
+    DEFAULT_RETRY_DELAY,
+    DEFAULT_TIMEOUT,
+)
 from ..exceptions import (
     PAGANSAuthenticationError,
     PAGANSModelNotFoundError,
@@ -22,14 +28,8 @@ from ..exceptions import (
     PAGANSRateLimitError,
     PAGANSTimeoutError,
 )
-from ..constants import (
-    API_VERSION,
-    CHAT_COMPLETIONS_ENDPOINT,
-    DEFAULT_HEADERS,
-    DEFAULT_MAX_RETRIES,
-    DEFAULT_RETRY_DELAY,
-    DEFAULT_TIMEOUT,
-)
+from ..models import Provider
+from .base import BaseClient
 
 
 class OpenRouterClient(BaseClient):
@@ -40,7 +40,7 @@ class OpenRouterClient(BaseClient):
     and proper error handling for API requests.
     """
 
-    def __init__(self, provider: Provider, config: Dict[str, Any]):
+    def __init__(self, provider: Provider, config: dict[str, Any]):
         """
         Initialize the OpenRouter client.
 
@@ -55,7 +55,9 @@ class OpenRouterClient(BaseClient):
             raise ValueError("API key is required")
 
         self.api_key = api_key
-        self.base_url = config.get("base_url", "https://openrouter.ai/api/v1").rstrip("/")
+        self.base_url = config.get("base_url", "https://openrouter.ai/api/v1").rstrip(
+            "/"
+        )
         self.timeout = config.get("timeout", DEFAULT_TIMEOUT)
         self.max_retries = config.get("max_retries", DEFAULT_MAX_RETRIES)
         self.retry_delay = config.get("retry_delay", DEFAULT_RETRY_DELAY)
@@ -80,9 +82,9 @@ class OpenRouterClient(BaseClient):
         self,
         method: str,
         endpoint: str,
-        data: Dict[str, Any] | None = None,
-        params: Dict[str, Any] | None = None,
-    ) -> Dict[str, Any]:
+        data: dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """
         Make an HTTP request with retry logic and error handling.
 
@@ -128,12 +130,13 @@ class OpenRouterClient(BaseClient):
                     )
                 if response.status_code == 429:
                     error_data = response.json()
-                    error_message = error_data.get("error", {}).get("message", "").lower()
+                    error_message = (
+                        error_data.get("error", {}).get("message", "").lower()
+                    )
                     if "quota" in error_message:
                         raise PAGANSQuotaExceededError("API quota exceeded")
-                    else:
-                        retry_after = self._parse_retry_after(response)
-                        raise PAGANSRateLimitError(retry_after=retry_after)
+                    retry_after = self._parse_retry_after(response)
+                    raise PAGANSRateLimitError(retry_after=retry_after)
                 if response.status_code >= 500:
                     raise PAGANSNetworkError(f"Server error: {response.status_code}")
                 error_data = response.json()
@@ -238,7 +241,7 @@ class OpenRouterClient(BaseClient):
 
         return choice["message"]["content"].strip()
 
-    async def get_models(self) -> Dict[str, Any]:
+    async def get_models(self) -> dict[str, Any]:
         """
         Get available models from OpenRouter API.
 

@@ -6,11 +6,11 @@ clients and managing their lifecycle.
 """
 
 import asyncio
-from typing import Dict, Any, Optional, Type
+from typing import Any
 
 from ..clients.base import BaseClient
-from ..models import Provider
 from ..exceptions import PAGANSConfigurationError
+from ..models import Provider
 
 
 class ProviderFactory:
@@ -23,15 +23,15 @@ class ProviderFactory:
 
     def __init__(self):
         """Initialize the provider factory."""
-        self._clients: Dict[Provider, BaseClient] = {}
-        self._client_classes: Dict[Provider, Type[BaseClient]] = {}
-        self._configs: Dict[Provider, Dict[str, Any]] = {}
+        self._clients: dict[Provider, BaseClient] = {}
+        self._client_classes: dict[Provider, type[BaseClient]] = {}
+        self._configs: dict[Provider, dict[str, Any]] = {}
 
     def register_client(
         self,
         provider: Provider,
-        client_class: Type[BaseClient],
-        config: Optional[Dict[str, Any]] = None
+        client_class: type[BaseClient],
+        config: dict[str, Any] | None = None,
     ) -> None:
         """
         Register a client class for a provider.
@@ -45,7 +45,9 @@ class ProviderFactory:
         if config:
             self._configs[provider] = config
 
-    def get_client(self, provider: Provider, config: Optional[Dict[str, Any]] = None) -> BaseClient:
+    def get_client(
+        self, provider: Provider, config: dict[str, Any] | None = None
+    ) -> BaseClient:
         """
         Get or create a client for the specified provider.
 
@@ -60,7 +62,9 @@ class ProviderFactory:
             ConfigurationError: If no client is registered for the provider
         """
         if provider not in self._client_classes:
-            raise PAGANSConfigurationError(f"No client registered for provider: {provider.value}")
+            raise PAGANSConfigurationError(
+                f"No client registered for provider: {provider.value}"
+            )
 
         if provider not in self._clients:
             # Merge default config with provided config
@@ -75,9 +79,7 @@ class ProviderFactory:
         return self._clients[provider]
 
     def get_or_create_client(
-        self,
-        provider: Provider,
-        config: Optional[Dict[str, Any]] = None
+        self, provider: Provider, config: dict[str, Any] | None = None
     ) -> BaseClient:
         """
         Get an existing client or create a new one for the provider.
@@ -128,7 +130,7 @@ class ProviderFactory:
         """
         return list(self._client_classes.keys())
 
-    def get_active_clients(self) -> Dict[Provider, BaseClient]:
+    def get_active_clients(self) -> dict[Provider, BaseClient]:
         """
         Get all currently active clients.
 
@@ -154,8 +156,8 @@ def get_provider_factory() -> ProviderFactory:
 
 def register_provider_client(
     provider: Provider,
-    client_class: Type[BaseClient],
-    config: Optional[Dict[str, Any]] = None
+    client_class: type[BaseClient],
+    config: dict[str, Any] | None = None,
 ) -> None:
     """
     Register a client class for a provider in the global factory.
@@ -169,8 +171,7 @@ def register_provider_client(
 
 
 def get_provider_client(
-    provider: Provider,
-    config: Optional[Dict[str, Any]] = None
+    provider: Provider, config: dict[str, Any] | None = None
 ) -> BaseClient:
     """
     Get or create a client for the specified provider using the global factory.

@@ -58,7 +58,6 @@ class TestEndToEndOptimization:
         assert result.target_model == "openai/gpt-4o"
         assert result.target_family == ModelFamily.OPENAI
 
-
     def test_batch_optimization_workflow(self, mock_client):
         """Test batch optimization of multiple prompts."""
         optimizer = PAGANSOptimizer(api_key="test-key")
@@ -213,13 +212,19 @@ class TestErrorHandlingAndRecovery:
                 if call_count == 1:
                     # First call fails
                     import httpx
+
                     raise httpx.NetworkError("Temporary network failure")
                 if call_count == 2:
                     # Second call fails differently
                     import httpx
+
                     raise httpx.TimeoutException("Request timeout")
                 # Third call succeeds
-                return {"choices": [{"message": {"content": "Successfully optimized after retries"}}]}
+                return {
+                    "choices": [
+                        {"message": {"content": "Successfully optimized after retries"}}
+                    ]
+                }
 
             mock_client._make_request.side_effect = mock_make_request_with_failures
             mock_client.validate_model.return_value = True
@@ -231,7 +236,9 @@ class TestErrorHandlingAndRecovery:
         optimizer = PAGANSOptimizer(api_key="test-key", max_retries=3)
 
         # Mock the optimize_prompt to return the expected result
-        failing_client.optimize_prompt.return_value = "Successfully optimized after retries"
+        failing_client.optimize_prompt.return_value = (
+            "Successfully optimized after retries"
+        )
 
         result = asyncio.run(
             optimizer.optimize(

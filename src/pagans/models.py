@@ -69,7 +69,6 @@ SHORT_MODEL_NAMES: dict[str, ModelFamily] = {
     "gpt-5": ModelFamily.OPENAI,
     "gpt-4.1": ModelFamily.OPENAI,
     "gpt-4o": ModelFamily.OPENAI,
-
     # Anthropic (latest + backward-compatible aliases)
     "claude-opus-4-20250514": ModelFamily.ANTHROPIC,
     "claude-sonnet-4-20250514": ModelFamily.ANTHROPIC,
@@ -84,7 +83,6 @@ SHORT_MODEL_NAMES: dict[str, ModelFamily] = {
     "claude-opus-4": ModelFamily.ANTHROPIC,
     "claude-sonnet-4": ModelFamily.ANTHROPIC,
     "claude-3.5-sonnet": ModelFamily.ANTHROPIC,
-
     # Google Gemini (latest text models + stable line)
     "gemini-2.5-flash-lite": ModelFamily.GOOGLE,
     "gemini-2.5-flash-lite-preview-09-2025": ModelFamily.GOOGLE,
@@ -94,7 +92,6 @@ SHORT_MODEL_NAMES: dict[str, ModelFamily] = {
     "gemini-3.1-flash-lite-preview": ModelFamily.GOOGLE,
     "gemini-2.5-pro": ModelFamily.GOOGLE,
     "gemini-2.5-flash": ModelFamily.GOOGLE,
-
     # xAI Grok (text models)
     "grok-4-1-fast-reasoning": ModelFamily.XAI,
     "grok-4-1-fast-non-reasoning": ModelFamily.XAI,
@@ -124,7 +121,6 @@ OPENROUTER_MODEL_MAPPINGS: dict[str, str] = {
     "gpt-5": "openai/gpt-5",
     "gpt-4.1": "openai/gpt-4.1",
     "gpt-4o": "openai/gpt-4o",
-
     # Anthropic
     "claude-opus-4-20250514": "anthropic/claude-opus-4-20250514",
     "claude-sonnet-4-20250514": "anthropic/claude-sonnet-4-20250514",
@@ -139,7 +135,6 @@ OPENROUTER_MODEL_MAPPINGS: dict[str, str] = {
     "claude-opus-4": "anthropic/claude-opus-4",
     "claude-sonnet-4": "anthropic/claude-sonnet-4",
     "claude-3.5-sonnet": "anthropic/claude-3.5-sonnet",
-
     # Google
     "gemini-2.5-flash-lite": "google/gemini-2.5-flash-lite",
     "gemini-2.5-flash-lite-preview-09-2025": "google/gemini-2.5-flash-lite-preview-09-2025",
@@ -149,7 +144,6 @@ OPENROUTER_MODEL_MAPPINGS: dict[str, str] = {
     "gemini-3.1-flash-lite-preview": "google/gemini-3.1-flash-lite-preview",
     "gemini-2.5-pro": "google/gemini-2.5-pro",
     "gemini-2.5-flash": "google/gemini-2.5-flash",
-
     # xAI
     "grok-4-1-fast-reasoning": "x-ai/grok-4-1-fast-reasoning",
     "grok-4-1-fast-non-reasoning": "x-ai/grok-4-1-fast-non-reasoning",
@@ -335,7 +329,9 @@ def resolve_model_and_provider(model_name: str) -> tuple[str, ModelFamily]:
         raise ValueError(f"Unknown model: {normalized}") from e
 
 
-def get_supported_models_by_provider(provider: Provider | str) -> dict[str, ModelFamily]:
+def get_supported_models_by_provider(
+    provider: Provider | str,
+) -> dict[str, ModelFamily]:
     """Return short model names supported by a provider."""
     if isinstance(provider, str):
         provider = Provider(provider.lower())

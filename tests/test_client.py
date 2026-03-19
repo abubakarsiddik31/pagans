@@ -5,15 +5,14 @@ This module contains tests for the OpenRouterClient class and its API interactio
 """
 
 import asyncio
-from datetime import UTC
 from unittest.mock import AsyncMock, Mock, patch
 
 import httpx
 import pytest
 
 from src.pagans.clients import OpenRouterClient
-from src.pagans.models import Provider
 from src.pagans.exceptions import PAGANSError
+from src.pagans.models import Provider
 
 
 class TestPAGANSClientInitialization:

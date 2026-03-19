@@ -38,7 +38,9 @@ class TestBaseOptimizationPrompt:
             def get_description(self):
                 return "Test description"
 
-        with pytest.raises(TypeError, match="Can't instantiate abstract class TestPrompt"):
+        with pytest.raises(
+            TypeError, match="Can't instantiate abstract class TestPrompt"
+        ):
             TestPrompt()
 
     def test_base_prompt_get_description_not_implemented(self):
@@ -48,7 +50,9 @@ class TestBaseOptimizationPrompt:
             def get_prompt(self, original_prompt, target_model):
                 return "Test prompt"
 
-        with pytest.raises(TypeError, match="Can't instantiate abstract class TestPrompt"):
+        with pytest.raises(
+            TypeError, match="Can't instantiate abstract class TestPrompt"
+        ):
             TestPrompt()
 
 
@@ -98,7 +102,10 @@ class TestOptimizationPromptManager:
         """Test getting a prompt that doesn't exist."""
         manager = OptimizationPromptManager()
 
-        with pytest.raises(ValueError, match="No optimization prompt registered for family: test_family"):
+        with pytest.raises(
+            ValueError,
+            match="No optimization prompt registered for family: test_family",
+        ):
             manager.get_prompt("test_family", "original", "target")
 
     def test_get_description_success(self):
@@ -118,7 +125,10 @@ class TestOptimizationPromptManager:
         """Test getting a description for a family that doesn't exist."""
         manager = OptimizationPromptManager()
 
-        with pytest.raises(ValueError, match="No optimization prompt registered for family: test_family"):
+        with pytest.raises(
+            ValueError,
+            match="No optimization prompt registered for family: test_family",
+        ):
             manager.get_description("test_family")
 
     def test_get_supported_families_empty(self):
@@ -254,7 +264,10 @@ class TestGlobalPromptFunctions:
 
     def test_get_optimization_prompt_invalid_family(self):
         """Test getting optimization prompt with invalid family."""
-        with pytest.raises(ValueError, match="No optimization prompt registered for family: invalid_family"):
+        with pytest.raises(
+            ValueError,
+            match="No optimization prompt registered for family: invalid_family",
+        ):
             get_optimization_prompt("invalid_family", "Test prompt", "gpt-4o")
 
     def test_get_optimization_description_success(self):
@@ -267,7 +280,10 @@ class TestGlobalPromptFunctions:
 
     def test_get_optimization_description_invalid_family(self):
         """Test getting optimization description with invalid family."""
-        with pytest.raises(ValueError, match="No optimization prompt registered for family: invalid_family"):
+        with pytest.raises(
+            ValueError,
+            match="No optimization prompt registered for family: invalid_family",
+        ):
             get_optimization_description("invalid_family")
 
     def test_get_supported_families(self):

@@ -78,8 +78,7 @@ class PAGANSOptimizer:
         self.provider = provider
 
         self.optimizer_model = optimizer_model or os.getenv(
-            ENV_PAGANS_OPTIMIZER_MODEL,
-            DEFAULT_PAGANS_OPTIMIZER_MODEL
+            ENV_PAGANS_OPTIMIZER_MODEL, DEFAULT_PAGANS_OPTIMIZER_MODEL
         )
 
         # For backward compatibility with tests
@@ -93,9 +92,7 @@ class PAGANSOptimizer:
                     "OpenRouter API key is required. Set OPENROUTER_API_KEY environment variable "
                     "or pass api_key parameter."
                 )
-                raise PAGANSConfigurationError(
-                    msg
-                )
+                raise PAGANSConfigurationError(msg)
 
         # Get base URL from environment if not provided
         if base_url is None:
@@ -143,7 +140,9 @@ class PAGANSOptimizer:
             msg = "Prompt cannot be empty"
             raise ValueError(msg)
 
-        target_model = target_model or "claude-3.5-sonnet"  # Default to a widely available model
+        target_model = (
+            target_model or "claude-3.5-sonnet"
+        )  # Default to a widely available model
 
         # Detect model family for the target model (what we're optimizing FOR)
         try:
@@ -276,9 +275,7 @@ class PAGANSOptimizer:
                 )
                 results[model] = result
             except Exception as e:
-                results[model] = PAGANSError(
-                    f"Failed to optimize for {model}: {e!s}"
-                )
+                results[model] = PAGANSError(f"Failed to optimize for {model}: {e!s}")
 
         return results
 
@@ -329,4 +326,3 @@ class PAGANSOptimizer:
     def get_cache_size(self) -> int:
         """Get the current cache size."""
         return len(self._optimization_cache)
-    

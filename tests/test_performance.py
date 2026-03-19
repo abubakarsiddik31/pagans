@@ -50,7 +50,6 @@ class TestPerformanceBenchmarks:
 
             yield mock_client
 
-
     def test_concurrent_load_handling(self, fast_mock_client):
         """Test handling of concurrent optimization requests."""
         optimizer = PAGANSOptimizer(api_key="test-key")
@@ -334,4 +333,3 @@ class TestResourceManagement:
         assert isinstance(result, OptimizationResult)
         # Cleanup should be automatic with context manager
         mock_client_with_cleanup.close.assert_called_once()
-

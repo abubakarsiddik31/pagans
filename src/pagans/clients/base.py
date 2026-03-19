@@ -6,7 +6,7 @@ clients must implement to ensure consistent interface across providers.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from typing import Any
 
 from ..models import Provider
 
@@ -19,7 +19,7 @@ class BaseClient(ABC):
     must implement to ensure consistency across different providers.
     """
 
-    def __init__(self, provider: Provider, config: Dict[str, Any]):
+    def __init__(self, provider: Provider, config: dict[str, Any]):
         """
         Initialize the base client.
 
@@ -55,7 +55,6 @@ class BaseClient(ABC):
         Raises:
             Various exceptions based on provider-specific errors
         """
-        pass
 
     @abstractmethod
     async def validate_model(self, model_name: str) -> bool:
@@ -68,10 +67,9 @@ class BaseClient(ABC):
         Returns:
             True if model is available, False otherwise
         """
-        pass
 
     @abstractmethod
-    async def get_models(self) -> Dict[str, Any]:
+    async def get_models(self) -> dict[str, Any]:
         """
         Get available models from the provider.
 
@@ -81,12 +79,10 @@ class BaseClient(ABC):
         Raises:
             Various exceptions based on provider-specific errors
         """
-        pass
 
     @abstractmethod
     async def close(self) -> None:
         """Close the client and clean up resources."""
-        pass
 
     @abstractmethod
     async def __aenter__(self):

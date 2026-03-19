@@ -75,5 +75,6 @@ class PAGANSAuthenticationError(PAGANSError):
 class PAGANSQuotaExceededError(PAGANSError):
     """Exception raised when API quota is exceeded."""
 
+
 class PAGANSOptimizerError(PAGANSError):
     """Exception raised when optimizer encounters an error."""

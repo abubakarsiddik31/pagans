@@ -5,7 +5,6 @@ This module provides a registry system for managing model families,
 providers, and their relationships in an extensible way.
 """
 
-from typing import Dict, List, Set, Optional
 from dataclasses import dataclass
 
 from . import ModelFamily, Provider
@@ -18,9 +17,9 @@ class ModelFamilyInfo:
     family: ModelFamily
     display_name: str
     description: str
-    supported_providers: List[Provider]
-    default_models: Dict[str, str]  # short_name -> provider_model_name
-    aliases: Dict[str, str]  # alias -> canonical_name
+    supported_providers: list[Provider]
+    default_models: dict[str, str]  # short_name -> provider_model_name
+    aliases: dict[str, str]  # alias -> canonical_name
 
 
 @dataclass
@@ -32,8 +31,8 @@ class ProviderInfo:
     description: str
     base_url: str
     api_version: str
-    supported_families: List[ModelFamily]
-    model_mappings: Dict[str, str]  # short_name -> provider_model_name
+    supported_families: list[ModelFamily]
+    model_mappings: dict[str, str]  # short_name -> provider_model_name
     auth_header: str
     auth_prefix: str = "Bearer"
 
@@ -48,10 +47,10 @@ class ModelRegistry:
 
     def __init__(self):
         """Initialize the model registry."""
-        self._families: Dict[ModelFamily, ModelFamilyInfo] = {}
-        self._providers: Dict[Provider, ProviderInfo] = {}
-        self._model_to_family: Dict[str, ModelFamily] = {}
-        self._family_to_models: Dict[ModelFamily, Set[str]] = {}
+        self._families: dict[ModelFamily, ModelFamilyInfo] = {}
+        self._providers: dict[Provider, ProviderInfo] = {}
+        self._model_to_family: dict[str, ModelFamily] = {}
+        self._family_to_models: dict[ModelFamily, set[str]] = {}
 
     def register_family(self, family_info: ModelFamilyInfo) -> None:
         """
@@ -70,8 +69,12 @@ class ModelRegistry:
         # Update family to models mapping
         if family_info.family not in self._family_to_models:
             self._family_to_models[family_info.family] = set()
-        self._family_to_models[family_info.family].update(family_info.default_models.keys())
-        self._family_to_models[family_info.family].update(family_info.default_models.values())
+        self._family_to_models[family_info.family].update(
+            family_info.default_models.keys()
+        )
+        self._family_to_models[family_info.family].update(
+            family_info.default_models.values()
+        )
 
     def register_provider(self, provider_info: ProviderInfo) -> None:
         """
@@ -82,7 +85,7 @@ class ModelRegistry:
         """
         self._providers[provider_info.provider] = provider_info
 
-    def get_family_info(self, family: ModelFamily) -> Optional[ModelFamilyInfo]:
+    def get_family_info(self, family: ModelFamily) -> ModelFamilyInfo | None:
         """
         Get information about a model family.
 
@@ -94,7 +97,7 @@ class ModelRegistry:
         """
         return self._families.get(family)
 
-    def get_provider_info(self, provider: Provider) -> Optional[ProviderInfo]:
+    def get_provider_info(self, provider: Provider) -> ProviderInfo | None:
         """
         Get information about a provider.
 
@@ -106,7 +109,7 @@ class ModelRegistry:
         """
         return self._providers.get(provider)
 
-    def get_model_family(self, model_name: str) -> Optional[ModelFamily]:
+    def get_model_family(self, model_name: str) -> ModelFamily | None:
         """
         Get the model family for a model name.
 
@@ -128,7 +131,7 @@ class ModelRegistry:
 
         return None
 
-    def get_models_for_family(self, family: ModelFamily) -> List[str]:
+    def get_models_for_family(self, family: ModelFamily) -> list[str]:
         """
         Get all models for a model family.
 
@@ -142,7 +145,7 @@ class ModelRegistry:
             return list(self._family_to_models[family])
         return []
 
-    def get_supported_providers_for_family(self, family: ModelFamily) -> List[Provider]:
+    def get_supported_providers_for_family(self, family: ModelFamily) -> list[Provider]:
         """
         Get all providers that support a model family.
 
@@ -158,10 +161,8 @@ class ModelRegistry:
         return []
 
     def get_provider_model_name(
-        self,
-        short_name: str,
-        provider: Provider
-    ) -> Optional[str]:
+        self, short_name: str, provider: Provider
+    ) -> str | None:
         """
         Get the provider-specific model name for a short model name.
 
@@ -197,7 +198,7 @@ class ModelRegistry:
         """
         return self.get_model_family(model_name) is not None
 
-    def get_all_families(self) -> List[ModelFamily]:
+    def get_all_families(self) -> list[ModelFamily]:
         """
         Get all registered model families.
 
@@ -206,7 +207,7 @@ class ModelRegistry:
         """
         return list(self._families.keys())
 
-    def get_all_providers(self) -> List[Provider]:
+    def get_all_providers(self) -> list[Provider]:
         """
         Get all registered providers.
 
@@ -215,7 +216,7 @@ class ModelRegistry:
         """
         return list(self._providers.keys())
 
-    def get_families_for_provider(self, provider: Provider) -> List[ModelFamily]:
+    def get_families_for_provider(self, provider: Provider) -> list[ModelFamily]:
         """
         Get all model families supported by a provider.
 
@@ -265,7 +266,7 @@ def register_provider(provider_info: ProviderInfo) -> None:
     get_model_registry().register_provider(provider_info)
 
 
-def get_model_family(model_name: str) -> Optional[ModelFamily]:
+def get_model_family(model_name: str) -> ModelFamily | None:
     """
     Get the model family for a model name using the global registry.
 

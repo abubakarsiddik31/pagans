@@ -10,11 +10,10 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from src.pagans.core import PAGANSOptimizer
-from src.pagans.providers import get_provider_client
 from src.pagans.exceptions import (
     PAGANSConfigurationError,
-    PAGANSModelNotFoundError,
     PAGANSError,
+    PAGANSModelNotFoundError,
 )
 from src.pagans.models import ModelFamily, OptimizationResult
 
@@ -169,7 +168,10 @@ class TestPAGANSOptimizerOptimization:
     def test_optimize_api_error(self, mock_optimizer):
         """Test optimization with API error raises error."""
         from src.pagans.exceptions import PAGANSOpenRouterAPIError
-        mock_optimizer.client.optimize_prompt.side_effect = PAGANSOpenRouterAPIError("API Error")
+
+        mock_optimizer.client.optimize_prompt.side_effect = PAGANSOpenRouterAPIError(
+            "API Error"
+        )
 
         with pytest.raises(PAGANSError, match="Failed to optimize prompt"):
             asyncio.run(

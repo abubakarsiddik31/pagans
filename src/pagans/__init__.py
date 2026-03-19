@@ -11,16 +11,15 @@ from .core import PAGANSOptimizer
 from .exceptions import (
     PAGANSAuthenticationError,
     PAGANSConfigurationError,
+    PAGANSError,
     PAGANSModelNotFoundError,
     PAGANSNetworkError,
     PAGANSOpenRouterAPIError,
-    PAGANSError,
     PAGANSQuotaExceededError,
     PAGANSRateLimitError,
     PAGANSTimeoutError,
     PAGANSValidationError,
 )
-
 from .models import (
     ModelFamily,
     OptimizationRequest,
@@ -29,7 +28,11 @@ from .models import (
     get_supported_models,
     is_supported_model,
 )
-from .models.registry import get_model_registry, register_model_family, register_provider
+from .models.registry import (
+    get_model_registry,
+    register_model_family,
+    register_provider,
+)
 from .optimizer_prompts import (
     get_optimization_description,
     get_optimization_prompt,
@@ -39,9 +42,7 @@ from .optimizer_prompts import (
 __version__ = "0.1.0"
 __author__ = "PAGANS Team"
 __email__ = "abubakar1808031@gmail.com"
-__description__ = (
-    "Prompts Aligned to Guidelines and Normalization System - Optimize prompts across LLM model families using OpenRouter"
-)
+__description__ = "Prompts Aligned to Guidelines and Normalization System - Optimize prompts across LLM model families using OpenRouter"
 
 # Main exports
 __all__ = [

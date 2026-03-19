@@ -147,8 +147,12 @@ def build_parser() -> argparse.ArgumentParser:
         prog="pagans",
         description="PAGANS CLI for prompt optimization via OpenRouter.",
     )
-    parser.add_argument("--api-key", help="OpenRouter API key. Defaults to OPENROUTER_API_KEY.")
-    parser.add_argument("--base-url", help="OpenRouter base URL. Defaults to OPENROUTER_BASE_URL.")
+    parser.add_argument(
+        "--api-key", help="OpenRouter API key. Defaults to OPENROUTER_API_KEY."
+    )
+    parser.add_argument(
+        "--base-url", help="OpenRouter base URL. Defaults to OPENROUTER_BASE_URL."
+    )
     parser.add_argument(
         "--optimizer-model",
         help="Model used to perform optimization. Defaults to PAGANS_OPTIMIZER_MODEL or package default.",
@@ -156,17 +160,29 @@ def build_parser() -> argparse.ArgumentParser:
 
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    optimize_parser = subparsers.add_parser("optimize", help="Optimize one prompt for one target model.")
+    optimize_parser = subparsers.add_parser(
+        "optimize", help="Optimize one prompt for one target model."
+    )
     optimize_parser.add_argument("--prompt", help="Prompt text.")
-    optimize_parser.add_argument("--prompt-file", help="Path to file containing the prompt text.")
-    optimize_parser.add_argument("--target-model", required=True, help="Target model to optimize for.")
+    optimize_parser.add_argument(
+        "--prompt-file", help="Path to file containing the prompt text."
+    )
+    optimize_parser.add_argument(
+        "--target-model", required=True, help="Target model to optimize for."
+    )
     optimize_parser.add_argument("--notes", help="Additional optimization notes.")
     optimize_parser.add_argument("--json", action="store_true", help="Output JSON.")
-    optimize_parser.add_argument("--no-cache", action="store_true", help="Disable cache.")
+    optimize_parser.add_argument(
+        "--no-cache", action="store_true", help="Disable cache."
+    )
 
-    compare_parser = subparsers.add_parser("compare", help="Compare optimization across multiple target models.")
+    compare_parser = subparsers.add_parser(
+        "compare", help="Compare optimization across multiple target models."
+    )
     compare_parser.add_argument("--prompt", help="Prompt text.")
-    compare_parser.add_argument("--prompt-file", help="Path to file containing the prompt text.")
+    compare_parser.add_argument(
+        "--prompt-file", help="Path to file containing the prompt text."
+    )
     compare_parser.add_argument(
         "--models",
         required=True,
@@ -174,16 +190,24 @@ def build_parser() -> argparse.ArgumentParser:
     )
     compare_parser.add_argument("--notes", help="Additional optimization notes.")
     compare_parser.add_argument("--json", action="store_true", help="Output JSON.")
-    compare_parser.add_argument("--no-cache", action="store_true", help="Disable cache.")
+    compare_parser.add_argument(
+        "--no-cache", action="store_true", help="Disable cache."
+    )
 
-    batch_parser = subparsers.add_parser("batch", help="Optimize multiple prompts from a file.")
+    batch_parser = subparsers.add_parser(
+        "batch", help="Optimize multiple prompts from a file."
+    )
     batch_parser.add_argument(
         "--prompts-file",
         required=True,
         help="Path to text file containing one prompt per line.",
     )
-    batch_parser.add_argument("--target-model", required=True, help="Target model to optimize for.")
-    batch_parser.add_argument("--max-concurrent", type=int, default=3, help="Max concurrent optimizations.")
+    batch_parser.add_argument(
+        "--target-model", required=True, help="Target model to optimize for."
+    )
+    batch_parser.add_argument(
+        "--max-concurrent", type=int, default=3, help="Max concurrent optimizations."
+    )
     batch_parser.add_argument("--notes", help="Additional optimization notes.")
     batch_parser.add_argument("--json", action="store_true", help="Output JSON.")
     batch_parser.add_argument("--no-cache", action="store_true", help="Disable cache.")

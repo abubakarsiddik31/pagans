@@ -39,9 +39,7 @@ class TestExtremeInputHandling:
             optimizer = PAGANSOptimizer(api_key="test-key")
 
             with pytest.raises(ValueError, match="Prompt cannot be empty"):
-                asyncio.run(
-                    optimizer.optimize(prompt="", target_model="openai/gpt-4o")
-                )
+                asyncio.run(optimizer.optimize(prompt="", target_model="openai/gpt-4o"))
 
     def test_whitespace_only_prompt(self, mock_client):
         """Test handling of whitespace-only prompts."""
@@ -59,7 +57,9 @@ class TestExtremeInputHandling:
             optimizer = PAGANSOptimizer(api_key="test-key")
 
             # Create a very long prompt (100KB+)
-            long_prompt = "Write a comprehensive tutorial about Python programming. " * 2000
+            long_prompt = (
+                "Write a comprehensive tutorial about Python programming. " * 2000
+            )
 
             result = asyncio.run(
                 optimizer.optimize(prompt=long_prompt, target_model="openai/gpt-4o")
@@ -90,7 +90,9 @@ class TestExtremeInputHandling:
             optimizer = PAGANSOptimizer(api_key="test-key")
 
             # Create a prompt with binary-like content
-            binary_prompt = "Analyze this data: " + "".join(chr(i) for i in range(32, 127))
+            binary_prompt = "Analyze this data: " + "".join(
+                chr(i) for i in range(32, 127)
+            )
 
             result = asyncio.run(
                 optimizer.optimize(prompt=binary_prompt, target_model="openai/gpt-4o")
@@ -129,17 +131,21 @@ class TestModelEdgeCases:
         """Test handling of unknown model families."""
         with patch("src.pagans.core.OpenRouterClient", return_value=mock_client):
             from src.pagans.exceptions import PAGANSModelNotFoundError
+
             optimizer = PAGANSOptimizer(api_key="test-key")
 
             with pytest.raises(PAGANSModelNotFoundError):
                 asyncio.run(
-                    optimizer.optimize(prompt="Test prompt", target_model="unknown/model-v123")
+                    optimizer.optimize(
+                        prompt="Test prompt", target_model="unknown/model-v123"
+                    )
                 )
 
     def test_model_with_special_characters(self, mock_client):
         """Test handling of model names with special characters."""
         with patch("src.pagans.core.OpenRouterClient", return_value=mock_client):
             from src.pagans.exceptions import PAGANSModelNotFoundError
+
             optimizer = PAGANSOptimizer(api_key="test-key")
 
             special_models = [
@@ -166,7 +172,8 @@ class TestModelEdgeCases:
 
             result = asyncio.run(
                 optimizer.optimize(
-                    prompt="Test prompt", target_model="OpenAI/GPT-4O"  # Mixed case
+                    prompt="Test prompt",
+                    target_model="OpenAI/GPT-4O",  # Mixed case
                 )
             )
 
@@ -189,8 +196,8 @@ class TestConfigurationEdgeCases:
                     "base_url": "https://openrouter.ai/api/v1",
                     "timeout": 0.001,
                     "max_retries": 3,
-                    "retry_delay": 1.0
-                }
+                    "retry_delay": 1.0,
+                },
             )
 
             # Very long timeout
@@ -202,8 +209,8 @@ class TestConfigurationEdgeCases:
                     "base_url": "https://openrouter.ai/api/v1",
                     "timeout": 3600.0,
                     "max_retries": 3,
-                    "retry_delay": 1.0
-                }
+                    "retry_delay": 1.0,
+                },
             )
 
             # Zero timeout (should handle gracefully)
@@ -215,8 +222,8 @@ class TestConfigurationEdgeCases:
                     "base_url": "https://openrouter.ai/api/v1",
                     "timeout": 0.0,
                     "max_retries": 3,
-                    "retry_delay": 1.0
-                }
+                    "retry_delay": 1.0,
+                },
             )
 
     def test_extreme_retry_values(self):
@@ -231,8 +238,8 @@ class TestConfigurationEdgeCases:
                     "base_url": "https://openrouter.ai/api/v1",
                     "timeout": 30.0,
                     "max_retries": 0,
-                    "retry_delay": 1.0
-                }
+                    "retry_delay": 1.0,
+                },
             )
 
             # Very high retry count
@@ -244,8 +251,8 @@ class TestConfigurationEdgeCases:
                     "base_url": "https://openrouter.ai/api/v1",
                     "timeout": 30.0,
                     "max_retries": 100,
-                    "retry_delay": 1.0
-                }
+                    "retry_delay": 1.0,
+                },
             )
 
     def test_extreme_concurrency_values(self):
@@ -355,7 +362,9 @@ class TestBatchProcessingEdgeCases:
             ]
 
             results = asyncio.run(
-                optimizer.optimize_multiple(prompts=prompts, target_model="openai/gpt-4o")
+                optimizer.optimize_multiple(
+                    prompts=prompts, target_model="openai/gpt-4o"
+                )
             )
 
             assert len(results) == len(prompts)
@@ -371,7 +380,9 @@ class TestBatchProcessingEdgeCases:
             prompts = ["Same prompt"] * 5
 
             results = asyncio.run(
-                optimizer.optimize_multiple(prompts=prompts, target_model="openai/gpt-4o")
+                optimizer.optimize_multiple(
+                    prompts=prompts, target_model="openai/gpt-4o"
+                )
             )
 
             assert len(results) == 5
@@ -417,11 +428,15 @@ class TestErrorRecoveryEdgeCases:
 
             # This should handle partial failures gracefully
             results = asyncio.run(
-                optimizer.optimize_multiple(prompts=prompts, target_model="openai/gpt-4o")
+                optimizer.optimize_multiple(
+                    prompts=prompts, target_model="openai/gpt-4o"
+                )
             )
 
             # Should have some successful results
-            successful_results = [r for r in results if isinstance(r, OptimizationResult)]
+            successful_results = [
+                r for r in results if isinstance(r, OptimizationResult)
+            ]
             assert len(successful_results) > 0
 
     def test_network_partition_simulation(self, failing_client):
@@ -438,7 +453,9 @@ class TestErrorRecoveryEdgeCases:
 
             with pytest.raises(PAGANSError):
                 asyncio.run(
-                    optimizer.optimize(prompt="Test prompt", target_model="openai/gpt-4o")
+                    optimizer.optimize(
+                        prompt="Test prompt", target_model="openai/gpt-4o"
+                    )
                 )
 
     def test_extreme_memory_pressure(self, failing_client):
@@ -517,7 +534,9 @@ class TestDataIntegrity:
 
             for original_prompt in test_prompts:
                 result = asyncio.run(
-                    optimizer.optimize(prompt=original_prompt, target_model="openai/gpt-4o")
+                    optimizer.optimize(
+                        prompt=original_prompt, target_model="openai/gpt-4o"
+                    )
                 )
 
                 assert result.original == original_prompt
