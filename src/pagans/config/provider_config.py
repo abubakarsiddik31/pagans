@@ -59,6 +59,30 @@ class ConfigManager:
                 "max_retries": 3,
                 "retry_delay": 1.0,
             },
+            Provider.OPENAI: {
+                "base_url": "https://api.openai.com/v1",
+                "timeout": 30.0,
+                "max_retries": 3,
+                "retry_delay": 1.0,
+            },
+            Provider.GOOGLE: {
+                "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+                "timeout": 30.0,
+                "max_retries": 3,
+                "retry_delay": 1.0,
+            },
+            Provider.ANTHROPIC: {
+                "base_url": "https://api.anthropic.com/v1",
+                "timeout": 30.0,
+                "max_retries": 3,
+                "retry_delay": 1.0,
+            },
+            Provider.ZAI: {
+                "base_url": "https://api.z.ai/api/paas/v4",
+                "timeout": 30.0,
+                "max_retries": 3,
+                "retry_delay": 1.0,
+            },
         }
 
     def load_from_env(self, provider: Provider) -> ProviderConfig:

@@ -20,6 +20,10 @@ class Provider(Enum):
     """Enum representing available inference providers for PAGANS."""
 
     OPENROUTER = "openrouter"
+    OPENAI = "openai"
+    GOOGLE = "google"
+    ANTHROPIC = "anthropic"
+    ZAI = "zai"
 
 
 class ModelFamily(Enum):
@@ -120,6 +124,42 @@ OPENROUTER_MODEL_MAPPINGS: dict[str, str] = {
     "grok-4": "x-ai/grok-4",
     "grok-4-fast": "x-ai/grok-4-fast",
     "grok-code-fast-1": "x-ai/grok-code-fast-1",
+}
+
+
+def _strip_provider_prefix(model_id: str, prefix: str) -> str:
+    if model_id.startswith(prefix):
+        return model_id[len(prefix) :]
+    return model_id
+
+
+OPENAI_MODEL_MAPPINGS: dict[str, str] = {
+    short_name: _strip_provider_prefix(provider_id, "openai/")
+    for short_name, provider_id in OPENROUTER_MODEL_MAPPINGS.items()
+    if provider_id.startswith("openai/")
+}
+
+GOOGLE_MODEL_MAPPINGS: dict[str, str] = {
+    short_name: _strip_provider_prefix(provider_id, "google/")
+    for short_name, provider_id in OPENROUTER_MODEL_MAPPINGS.items()
+    if provider_id.startswith("google/")
+}
+
+ANTHROPIC_MODEL_MAPPINGS: dict[str, str] = {
+    short_name: _strip_provider_prefix(provider_id, "anthropic/")
+    for short_name, provider_id in OPENROUTER_MODEL_MAPPINGS.items()
+    if provider_id.startswith("anthropic/")
+}
+
+# Z.ai is used as an optimizer provider. Model aliases are currently user-specified.
+ZAI_MODEL_MAPPINGS: dict[str, str] = {}
+
+PROVIDER_MODEL_MAPPINGS: dict[Provider, dict[str, str]] = {
+    Provider.OPENROUTER: OPENROUTER_MODEL_MAPPINGS,
+    Provider.OPENAI: OPENAI_MODEL_MAPPINGS,
+    Provider.GOOGLE: GOOGLE_MODEL_MAPPINGS,
+    Provider.ANTHROPIC: ANTHROPIC_MODEL_MAPPINGS,
+    Provider.ZAI: ZAI_MODEL_MAPPINGS,
 }
 
 
@@ -268,31 +308,40 @@ def get_supported_models_by_provider(
     if isinstance(provider, str):
         provider = Provider(provider.lower())
 
-    if provider != Provider.OPENROUTER:
-        return {}
+    provider_mappings = PROVIDER_MODEL_MAPPINGS.get(provider, {})
 
-    return {
-        short_name: SHORT_MODEL_NAMES[short_name]
-        for short_name in OPENROUTER_MODEL_MAPPINGS
-    }
+    return {short_name: SHORT_MODEL_NAMES[short_name] for short_name in provider_mappings}
 
 
 def get_all_supported_providers() -> list[Provider]:
     """Get all providers supported by PAGANS runtime."""
-    return [Provider.OPENROUTER]
+    return list(PROVIDER_MODEL_MAPPINGS.keys())
 
 
 def get_provider_model_name(short_name: str, provider: Provider) -> str:
     """Resolve a short name to provider-specific model id."""
-    if provider != Provider.OPENROUTER:
+    provider_mappings = PROVIDER_MODEL_MAPPINGS.get(provider)
+    if provider_mappings is None:
         msg = f"Provider not supported: {provider.value}"
         raise ValueError(msg)
 
-    if short_name not in OPENROUTER_MODEL_MAPPINGS:
-        msg = f"Model '{short_name}' is not available on OpenRouter"
-        raise ValueError(msg)
+    if short_name in provider_mappings:
+        return provider_mappings[short_name]
 
-    return OPENROUTER_MODEL_MAPPINGS[short_name]
+    # Pass-through already provider-prefixed names.
+    if provider == Provider.OPENROUTER and "/" in short_name:
+        return short_name
+    if provider != Provider.OPENROUTER:
+        provider_prefix = f"{provider.value}/"
+        if short_name.startswith(provider_prefix):
+            return _strip_provider_prefix(short_name, provider_prefix)
+        if "/" not in short_name and short_name:
+            # Native providers usually accept plain model ids.
+            return short_name
+
+    provider_name = provider.value.capitalize()
+    msg = f"Model '{short_name}' is not available on {provider_name}"
+    raise ValueError(msg)
 
 
 from .registry import (

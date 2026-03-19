@@ -8,11 +8,23 @@ and other constants used throughout the package.
 # Environment variable names
 ENV_OPENROUTER_API_KEY = "OPENROUTER_API_KEY"
 ENV_OPENROUTER_BASE_URL = "OPENROUTER_BASE_URL"
+ENV_OPENAI_API_KEY = "OPENAI_API_KEY"
+ENV_OPENAI_BASE_URL = "OPENAI_BASE_URL"
+ENV_GOOGLE_API_KEY = "GOOGLE_API_KEY"
+ENV_GOOGLE_BASE_URL = "GOOGLE_BASE_URL"
+ENV_ANTHROPIC_API_KEY = "ANTHROPIC_API_KEY"
+ENV_ANTHROPIC_BASE_URL = "ANTHROPIC_BASE_URL"
+ENV_ZAI_API_KEY = "ZAI_API_KEY"
+ENV_ZAI_BASE_URL = "ZAI_BASE_URL"
 ENV_PAGANS_OPTIMIZER_MODEL = "PAGANS_OPTIMIZER_MODEL"
 
 # Default configuration values
 DEFAULT_PAGANS_OPTIMIZER_MODEL = "openai/gpt-4o-mini"
 DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
+DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1"
+DEFAULT_GOOGLE_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai"
+DEFAULT_ANTHROPIC_BASE_URL = "https://api.anthropic.com/v1"
+DEFAULT_ZAI_BASE_URL = "https://api.z.ai/api/paas/v4"
 DEFAULT_TIMEOUT = 30.0  # seconds
 DEFAULT_MAX_RETRIES = 3
 DEFAULT_RETRY_DELAY = 1.0  # seconds

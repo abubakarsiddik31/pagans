@@ -1,12 +1,10 @@
-"""
-Provider factory and management system.
+"""Provider factory and management system."""
 
-This module contains the factory pattern implementation for creating
-and managing provider-specific clients.
-"""
-
-# Import and register the OpenRouter client
+from ..clients.anthropic import AnthropicClient
+from ..clients.google import GoogleAIStudioClient
+from ..clients.openai import OpenAIClient
 from ..clients.openrouter import OpenRouterClient
+from ..clients.zai import ZAIClient
 from ..models import Provider
 from .factory import (
     ProviderFactory,
@@ -15,8 +13,11 @@ from .factory import (
     register_provider_client,
 )
 
-# Register the OpenRouter client with the factory
 register_provider_client(Provider.OPENROUTER, OpenRouterClient)
+register_provider_client(Provider.OPENAI, OpenAIClient)
+register_provider_client(Provider.GOOGLE, GoogleAIStudioClient)
+register_provider_client(Provider.ANTHROPIC, AnthropicClient)
+register_provider_client(Provider.ZAI, ZAIClient)
 
 __all__ = [
     "ProviderFactory",

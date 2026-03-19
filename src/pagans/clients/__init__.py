@@ -1,14 +1,17 @@
-"""
-Client implementations for OpenRouter.
+"""Client implementations for PAGANS providers."""
 
-This module contains the OpenRouter client implementation
-that follows the BaseClient interface.
-"""
-
+from .anthropic import AnthropicClient
 from .base import BaseClient
+from .google import GoogleAIStudioClient
+from .openai import OpenAIClient
 from .openrouter import OpenRouterClient
+from .zai import ZAIClient
 
 __all__ = [
     "BaseClient",
     "OpenRouterClient",
+    "OpenAIClient",
+    "GoogleAIStudioClient",
+    "AnthropicClient",
+    "ZAIClient",
 ]

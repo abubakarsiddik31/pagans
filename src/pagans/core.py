@@ -12,14 +12,26 @@ import time
 
 from .clients.openrouter import OpenRouterClient
 from .constants import (
+    DEFAULT_ANTHROPIC_BASE_URL,
     DEFAULT_BASE_URL,
+    DEFAULT_GOOGLE_BASE_URL,
     DEFAULT_MAX_RETRIES,
+    DEFAULT_OPENAI_BASE_URL,
     DEFAULT_PAGANS_OPTIMIZER_MODEL,
     DEFAULT_RETRY_DELAY,
     DEFAULT_TIMEOUT,
+    DEFAULT_ZAI_BASE_URL,
+    ENV_ANTHROPIC_API_KEY,
+    ENV_ANTHROPIC_BASE_URL,
+    ENV_GOOGLE_API_KEY,
+    ENV_GOOGLE_BASE_URL,
+    ENV_OPENAI_API_KEY,
+    ENV_OPENAI_BASE_URL,
     ENV_OPENROUTER_API_KEY,
     ENV_OPENROUTER_BASE_URL,
     ENV_PAGANS_OPTIMIZER_MODEL,
+    ENV_ZAI_API_KEY,
+    ENV_ZAI_BASE_URL,
 )
 from .exceptions import (
     PAGANSConfigurationError,
@@ -44,6 +56,38 @@ from .optimizer_prompts import (
 )
 from .providers import get_provider_client
 
+PROVIDER_API_KEY_ENV_MAP: dict[Provider, str] = {
+    Provider.OPENROUTER: ENV_OPENROUTER_API_KEY,
+    Provider.OPENAI: ENV_OPENAI_API_KEY,
+    Provider.GOOGLE: ENV_GOOGLE_API_KEY,
+    Provider.ANTHROPIC: ENV_ANTHROPIC_API_KEY,
+    Provider.ZAI: ENV_ZAI_API_KEY,
+}
+
+PROVIDER_BASE_URL_ENV_MAP: dict[Provider, str] = {
+    Provider.OPENROUTER: ENV_OPENROUTER_BASE_URL,
+    Provider.OPENAI: ENV_OPENAI_BASE_URL,
+    Provider.GOOGLE: ENV_GOOGLE_BASE_URL,
+    Provider.ANTHROPIC: ENV_ANTHROPIC_BASE_URL,
+    Provider.ZAI: ENV_ZAI_BASE_URL,
+}
+
+PROVIDER_DEFAULT_BASE_URL_MAP: dict[Provider, str] = {
+    Provider.OPENROUTER: DEFAULT_BASE_URL,
+    Provider.OPENAI: DEFAULT_OPENAI_BASE_URL,
+    Provider.GOOGLE: DEFAULT_GOOGLE_BASE_URL,
+    Provider.ANTHROPIC: DEFAULT_ANTHROPIC_BASE_URL,
+    Provider.ZAI: DEFAULT_ZAI_BASE_URL,
+}
+
+PROVIDER_DEFAULT_OPTIMIZER_MODEL_MAP: dict[Provider, str] = {
+    Provider.OPENROUTER: DEFAULT_PAGANS_OPTIMIZER_MODEL,
+    Provider.OPENAI: "gpt-4.1-mini",
+    Provider.GOOGLE: "gemini-2.5-flash",
+    Provider.ANTHROPIC: "claude-sonnet-4-20250514",
+    Provider.ZAI: "glm-4.7",
+}
+
 
 class PAGANSOptimizer:
     """
@@ -67,8 +111,8 @@ class PAGANSOptimizer:
         Initialize the PAGANSOptimizer.
 
         Args:
-            api_key: OpenRouter API key (if None, tries to get from environment)
-            base_url: OpenRouter base URL (if None, tries to get from environment)
+            api_key: Provider API key (if None, tries provider env var)
+            base_url: Provider base URL (if None, tries provider env var)
             provider: Provider to use for optimization client
             optimizer_model: Model that does the optimization work (if None, uses env or default)
             timeout: Request timeout in seconds
@@ -77,26 +121,36 @@ class PAGANSOptimizer:
         """
         self.provider = provider
 
-        self.optimizer_model = optimizer_model or os.getenv(
-            ENV_PAGANS_OPTIMIZER_MODEL, DEFAULT_PAGANS_OPTIMIZER_MODEL
+        provider_default_optimizer_model = PROVIDER_DEFAULT_OPTIMIZER_MODEL_MAP.get(
+            provider, DEFAULT_PAGANS_OPTIMIZER_MODEL
+        )
+        self.optimizer_model = (
+            optimizer_model
+            or os.getenv(ENV_PAGANS_OPTIMIZER_MODEL)
+            or provider_default_optimizer_model
         )
 
         # For backward compatibility with tests
         self.default_model = self.optimizer_model
 
-        # Get API key from environment if not provided
+        # Get provider-specific API key from environment if not provided.
+        api_key_env = PROVIDER_API_KEY_ENV_MAP.get(provider, ENV_OPENROUTER_API_KEY)
         if api_key is None:
-            api_key = os.getenv(ENV_OPENROUTER_API_KEY)
+            api_key = os.getenv(api_key_env)
             if api_key is None:
                 msg = (
-                    "OpenRouter API key is required. Set OPENROUTER_API_KEY environment variable "
-                    "or pass api_key parameter."
+                    f"{provider.value.upper()} API key is required. "
+                    f"Set {api_key_env} environment variable or pass api_key parameter."
                 )
                 raise PAGANSConfigurationError(msg)
 
-        # Get base URL from environment if not provided
+        # Get provider-specific base URL from environment if not provided.
+        base_url_env = PROVIDER_BASE_URL_ENV_MAP.get(provider, ENV_OPENROUTER_BASE_URL)
+        provider_default_base_url = PROVIDER_DEFAULT_BASE_URL_MAP.get(
+            provider, DEFAULT_BASE_URL
+        )
         if base_url is None:
-            base_url = os.getenv(ENV_OPENROUTER_BASE_URL, DEFAULT_BASE_URL)
+            base_url = os.getenv(base_url_env, provider_default_base_url)
 
         config = {
             "api_key": api_key,
@@ -105,8 +159,7 @@ class PAGANSOptimizer:
             "max_retries": max_retries,
             "retry_delay": retry_delay,
         }
-        # Backward-compatible OpenRouter path (used by existing tests and users),
-        # with factory fallback for non-OpenRouter providers.
+        # Backward-compatible OpenRouter path with factory route for all other providers.
         if self.provider == Provider.OPENROUTER:
             self.client = OpenRouterClient(provider=self.provider, config=config)
         else:
@@ -198,6 +251,9 @@ class PAGANSOptimizer:
             raise PAGANSOptimizerError(msg)
         except PAGANSTimeoutError as e:
             msg = f"Timeout during optimization: {e!s}"
+            raise PAGANSOptimizerError(msg)
+        except PAGANSError as e:
+            msg = f"Failed to optimize prompt: {e!s}"
             raise PAGANSOptimizerError(msg)
 
     async def optimize_multiple(

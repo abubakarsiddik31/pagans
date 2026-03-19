@@ -15,7 +15,7 @@ from src.pagans.exceptions import (
     PAGANSError,
     PAGANSModelNotFoundError,
 )
-from src.pagans.models import ModelFamily, OptimizationResult
+from src.pagans.models import ModelFamily, OptimizationResult, Provider
 
 
 class TestPAGANSOptimizerInitialization:
@@ -71,6 +71,19 @@ class TestPAGANSOptimizerInitialization:
 
         assert optimizer.client.provider.value == "openrouter"
         assert optimizer.optimizer_model == optimizer_model
+
+    def test_init_with_openai_provider_environment_variables(self):
+        """Test initialization for OpenAI provider via environment variables."""
+        with patch.dict(
+            "os.environ",
+            {
+                "OPENAI_API_KEY": "env-openai-key",
+                "OPENAI_BASE_URL": "https://api.openai.com/v1",
+            },
+        ):
+            optimizer = PAGANSOptimizer(provider=Provider.OPENAI)
+            assert optimizer.client.provider.value == "openai"
+            assert optimizer.client.base_url == "https://api.openai.com/v1"
 
 
 class TestPAGANSOptimizerOptimization:

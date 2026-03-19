@@ -1,6 +1,12 @@
 """PAGANS package."""
 
-from .clients.openrouter import OpenRouterClient
+from .clients import (
+    AnthropicClient,
+    GoogleAIStudioClient,
+    OpenAIClient,
+    OpenRouterClient,
+    ZAIClient,
+)
 from .core import PAGANSOptimizer
 from .exceptions import (
     PAGANSAuthenticationError,
@@ -18,6 +24,7 @@ from .models import (
     ModelFamily,
     OptimizationRequest,
     OptimizationResult,
+    Provider,
     detect_model_family,
     get_supported_models,
     is_supported_model,
@@ -38,7 +45,7 @@ __author__ = "Abu Bakar Siddik"
 __email__ = "abubakar1808031@gmail.com"
 __description__ = (
     "Prompts Aligned to Guidelines and Normalization System for LLM families "
-    "using OpenRouter"
+    "across OpenRouter, OpenAI, Google AI Studio, Anthropic, and Z.ai"
 )
 
 # Main exports
@@ -46,7 +53,12 @@ __all__ = [
     # Main classes
     "PAGANSOptimizer",
     "OpenRouterClient",
+    "OpenAIClient",
+    "GoogleAIStudioClient",
+    "AnthropicClient",
+    "ZAIClient",
     # Models and data structures
+    "Provider",
     "ModelFamily",
     "OptimizationResult",
     "OptimizationRequest",
@@ -80,14 +92,16 @@ def create_optimizer(
     api_key: str = None,
     base_url: str = None,
     default_model: str = None,
+    provider: Provider = Provider.OPENROUTER,
 ) -> PAGANSOptimizer:
     """
     Create a PAGANS PAGANSOptimizer instance with the given configuration.
 
     Args:
-        api_key: OpenRouter API key (if None, tries to get from environment)
-        base_url: OpenRouter base URL (if None, tries to get from environment)
+        api_key: Provider API key (if None, tries to get from provider env var)
+        base_url: Provider base URL (if None, tries to get from provider env var)
         default_model: Default model for optimization (if None, uses default)
+        provider: Optimizer provider to use
 
     Returns:
         PAGANSOptimizer instance
@@ -98,6 +112,7 @@ def create_optimizer(
     return PAGANSOptimizer(
         api_key=api_key,
         base_url=base_url,
+        provider=provider,
         optimizer_model=default_model,
     )
 

@@ -14,17 +14,17 @@
 PAGANS (Prompts Aligned to Guidelines and Normalization System) is a prompt
 optimization framework for LLM applications. It adapts prompts to the target
 model family automatically so the same prompt can perform better across
-OpenAI, Anthropic, Google, and xAI model series through OpenRouter.
+OpenAI, Anthropic, Google, and xAI model series.
 
-## ✨ Features
+## Features
 
-- 🚀 Fast prompt optimization for production workflows
-- 🎯 Family-aware optimization for OpenAI, Anthropic, Google, and xAI models
-- 🔍 Automatic model-family detection from short and provider-prefixed names
-- ⚡ Async-first API for single, compare, and batch operations
-- 🧠 Built-in caching to reduce repeated optimization cost
-- 🛠️ CLI support for optimize, compare, and batch workflows
-- 🔗 Unified OpenRouter integration path
+- Fast prompt optimization for production workflows
+- Family-aware optimization for OpenAI, Anthropic, Google, and xAI models
+- Automatic model-family detection from short and provider-prefixed names
+- Async-first API for single, compare, and batch operations
+- Built-in caching to reduce repeated optimization cost
+- CLI support for optimize, compare, and batch workflows
+- Optimizer provider support for OpenRouter, OpenAI, Google AI Studio, Anthropic, and Z.ai
 
 ## Installation
 
@@ -36,11 +36,12 @@ pip install pagans
 
 ```python
 import asyncio
-from pagans import PAGANSOptimizer
+
+from pagans import PAGANSOptimizer, Provider
 
 
 async def main() -> None:
-    async with PAGANSOptimizer() as optimizer:
+    async with PAGANSOptimizer(provider=Provider.OPENROUTER) as optimizer:
         result = await optimizer.optimize(
             prompt="Write a robust retry policy for external API calls.",
             target_model="openai/gpt-4o",
@@ -51,17 +52,51 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-Required environment variable:
+## Provider Configuration
+
+Set one provider key (or pass `api_key` and `base_url` explicitly).
 
 ```bash
+# OpenRouter
 export OPENROUTER_API_KEY="your-openrouter-api-key"
+export OPENROUTER_BASE_URL="https://openrouter.ai/api/v1"
+
+# OpenAI
+export OPENAI_API_KEY="your-openai-api-key"
+export OPENAI_BASE_URL="https://api.openai.com/v1"
+
+# Google AI Studio (Gemini OpenAI-compatible endpoint)
+export GOOGLE_API_KEY="your-gemini-api-key"
+export GOOGLE_BASE_URL="https://generativelanguage.googleapis.com/v1beta/openai"
+
+# Anthropic
+export ANTHROPIC_API_KEY="your-anthropic-api-key"
+export ANTHROPIC_BASE_URL="https://api.anthropic.com/v1"
+
+# Z.ai
+export ZAI_API_KEY="your-zai-api-key"
+export ZAI_BASE_URL="https://api.z.ai/api/paas/v4"
+
+# Optional global override for optimizer model
+export PAGANS_OPTIMIZER_MODEL="openai/gpt-4o-mini"
 ```
 
-Optional environment variables:
+### Python Provider Examples
 
-```bash
-export OPENROUTER_BASE_URL="https://openrouter.ai/api/v1"
-export PAGANS_OPTIMIZER_MODEL="openai/gpt-4o-mini"
+```python
+from pagans import PAGANSOptimizer, Provider
+
+# OpenAI as optimizer provider
+optimizer = PAGANSOptimizer(provider=Provider.OPENAI)
+
+# Google AI Studio as optimizer provider
+optimizer = PAGANSOptimizer(provider=Provider.GOOGLE)
+
+# Anthropic as optimizer provider
+optimizer = PAGANSOptimizer(provider=Provider.ANTHROPIC)
+
+# Z.ai as optimizer provider
+optimizer = PAGANSOptimizer(provider=Provider.ZAI)
 ```
 
 ## CLI
@@ -69,20 +104,24 @@ export PAGANS_OPTIMIZER_MODEL="openai/gpt-4o-mini"
 PAGANS installs a CLI as `pagans`.
 
 ```bash
-pagans optimize --prompt "Explain quantum computing for beginners" --target-model gpt-4o
+pagans --provider openrouter optimize \
+  --prompt "Explain quantum computing for beginners" \
+  --target-model gpt-4o
 ```
 
 ```bash
-pagans compare \
+pagans --provider openai compare \
   --prompt "Design an event-driven order system" \
   --models "gpt-4o,claude-sonnet-4,gemini-2.5-pro"
 ```
 
 ```bash
-pagans batch --prompts-file ./prompts.txt --target-model gemini-2.5-pro
+pagans --provider anthropic batch \
+  --prompts-file ./prompts.txt \
+  --target-model gemini-2.5-pro
 ```
 
-## 🎯 Model Family Series
+## Model Family Series
 
 PAGANS optimizes prompts for these model families and series:
 
@@ -92,6 +131,17 @@ PAGANS optimizes prompts for these model families and series:
 - xAI Grok series
 
 PAGANS detects the target model family and applies the matching optimization strategy automatically.
+
+## Notebooks
+
+Provider notebook examples are available in [`notebooks/`](./notebooks):
+
+- `pagans_quickstart.ipynb`
+- `pagans_openrouter_optimizer.ipynb`
+- `pagans_openai_optimizer.ipynb`
+- `pagans_google_optimizer.ipynb`
+- `pagans_anthropic_optimizer.ipynb`
+- `pagans_zai_optimizer.ipynb`
 
 ## Links
 

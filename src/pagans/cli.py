@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from .core import PAGANSOptimizer
+from .models import Provider
 
 CLI_BANNER = r"""
    ██████╗  █████╗  ██████╗  █████╗ ███╗   ██╗ ███████╗
@@ -95,9 +96,11 @@ def _print_compare(results: dict[str, Any], as_json: bool) -> None:
 
 async def _run_optimize(args: argparse.Namespace) -> int:
     prompt = _read_prompt(args.prompt, args.prompt_file)
+    provider = Provider(args.provider.lower())
     async with PAGANSOptimizer(
         api_key=args.api_key,
         base_url=args.base_url,
+        provider=provider,
         optimizer_model=args.optimizer_model,
     ) as optimizer:
         result = await optimizer.optimize(
@@ -112,6 +115,7 @@ async def _run_optimize(args: argparse.Namespace) -> int:
 
 async def _run_compare(args: argparse.Namespace) -> int:
     prompt = _read_prompt(args.prompt, args.prompt_file)
+    provider = Provider(args.provider.lower())
     target_models = [m.strip() for m in args.models.split(",") if m.strip()]
     if not target_models:
         raise ValueError("At least one model is required via --models.")
@@ -119,6 +123,7 @@ async def _run_compare(args: argparse.Namespace) -> int:
     async with PAGANSOptimizer(
         api_key=args.api_key,
         base_url=args.base_url,
+        provider=provider,
         optimizer_model=args.optimizer_model,
     ) as optimizer:
         results = await optimizer.compare_optimizations(
@@ -133,10 +138,12 @@ async def _run_compare(args: argparse.Namespace) -> int:
 
 async def _run_batch(args: argparse.Namespace) -> int:
     prompts = _read_prompts_file(args.prompts_file)
+    provider = Provider(args.provider.lower())
 
     async with PAGANSOptimizer(
         api_key=args.api_key,
         base_url=args.base_url,
+        provider=provider,
         optimizer_model=args.optimizer_model,
     ) as optimizer:
         results = await optimizer.optimize_multiple(
@@ -160,13 +167,29 @@ async def _run_batch(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="pagans",
-        description="PAGANS CLI for prompt optimization via OpenRouter.",
+        description="PAGANS CLI for prompt optimization across providers.",
     )
     parser.add_argument(
-        "--api-key", help="OpenRouter API key. Defaults to OPENROUTER_API_KEY."
+        "--api-key",
+        help=(
+            "Provider API key. Defaults to provider-specific env var "
+            "(OPENROUTER_API_KEY, OPENAI_API_KEY, GOOGLE_API_KEY, "
+            "ANTHROPIC_API_KEY, or ZAI_API_KEY)."
+        ),
     )
     parser.add_argument(
-        "--base-url", help="OpenRouter base URL. Defaults to OPENROUTER_BASE_URL."
+        "--base-url",
+        help=(
+            "Provider base URL. Defaults to provider-specific env var "
+            "(OPENROUTER_BASE_URL, OPENAI_BASE_URL, GOOGLE_BASE_URL, "
+            "ANTHROPIC_BASE_URL, or ZAI_BASE_URL)."
+        ),
+    )
+    parser.add_argument(
+        "--provider",
+        default=Provider.OPENROUTER.value,
+        choices=[provider.value for provider in Provider],
+        help="Optimizer provider to use. Defaults to openrouter.",
     )
     parser.add_argument(
         "--optimizer-model",

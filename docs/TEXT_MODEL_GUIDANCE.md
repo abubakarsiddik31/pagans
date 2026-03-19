@@ -1,8 +1,27 @@
 # Text Model Guidance Matrix
 
-Last reviewed: **2026-03-18**
+Last reviewed: **2026-03-19**
 
-This file tracks official prompt-guidance sources and the text-model aliases currently maintained in PAGANS.
+This file tracks official prompt-guidance sources, provider API references, and the text-model aliases currently maintained in PAGANS.
+
+## Optimizer Provider APIs
+
+Official API docs used for provider client configuration:
+
+- OpenAI Chat Completions: https://platform.openai.com/docs/api-reference/chat/create-chat-completion
+- OpenAI Models API: https://platform.openai.com/docs/api-reference/models
+- Google AI Studio OpenAI compatibility: https://ai.google.dev/gemini-api/docs/openai
+- Anthropic Messages API: https://docs.anthropic.com/en/api/messages
+- Anthropic Models API: https://docs.anthropic.com/en/api/models
+- Z.ai developer quick start: https://docs.z.ai/guides
+
+Configured default base URLs:
+
+- OpenRouter: `https://openrouter.ai/api/v1`
+- OpenAI: `https://api.openai.com/v1`
+- Google AI Studio: `https://generativelanguage.googleapis.com/v1beta/openai`
+- Anthropic: `https://api.anthropic.com/v1`
+- Z.ai: `https://api.z.ai/api/paas/v4`
 
 ## OpenAI
 
@@ -36,8 +55,8 @@ Compatibility aliases kept for routing:
 ## Google Gemini
 
 Official docs used:
-- https://ai.google.dev/gemini-api/docs/models/gemini-v2
-- https://ai.google.dev/gemini-api/docs/models/generative-models
+- https://ai.google.dev/gemini-api/docs/models
+- https://ai.google.dev/gemini-api/docs/openai
 
 Primary optimization targets (latest text focus):
 - `gemini-3.1-pro-preview`, `gemini-3-flash-preview`, `gemini-3.1-flash-lite-preview`
@@ -66,10 +85,10 @@ Compatibility aliases kept for routing:
 
 When updating model aliases:
 1. Confirm canonical model IDs in each provider's official docs.
-2. Confirm OpenRouter provider prefixes/IDs for routed usage.
-3. Update `src/pagans/models.py`:
+2. Confirm provider prefix/ID conventions for routed usage.
+3. Update `src/pagans/models.py` and `src/pagans/models/__init__.py`:
    - `SHORT_MODEL_NAMES`
-   - `OPENROUTER_MODEL_MAPPINGS`
+   - provider-specific model mappings
    - `MODEL_MAPPINGS`
 4. Add/update tests in `tests/test_models.py` and `tests/test_optimizer_prompts.py`.
 5. Update this file's "Last reviewed" date.

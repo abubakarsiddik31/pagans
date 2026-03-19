@@ -15,7 +15,9 @@ from src.pagans.models import (
     OptimizationResult,
     Provider,
     detect_model_family,
+    get_all_supported_providers,
     get_supported_models,
+    get_supported_models_by_provider,
     is_supported_model,
 )
 
@@ -36,6 +38,31 @@ class TestModelFamily:
         assert ModelFamily.ANTHROPIC.name == "ANTHROPIC"
         assert ModelFamily.GOOGLE.name == "GOOGLE"
         assert ModelFamily.XAI.name == "XAI"
+
+
+class TestProviders:
+    """Test cases for optimizer provider support."""
+
+    def test_provider_values(self):
+        assert Provider.OPENROUTER.value == "openrouter"
+        assert Provider.OPENAI.value == "openai"
+        assert Provider.GOOGLE.value == "google"
+        assert Provider.ANTHROPIC.value == "anthropic"
+        assert Provider.ZAI.value == "zai"
+
+    def test_get_all_supported_providers(self):
+        providers = get_all_supported_providers()
+        assert Provider.OPENROUTER in providers
+        assert Provider.OPENAI in providers
+        assert Provider.GOOGLE in providers
+        assert Provider.ANTHROPIC in providers
+        assert Provider.ZAI in providers
+
+    def test_supported_models_by_provider(self):
+        openai_models = get_supported_models_by_provider(Provider.OPENAI)
+        assert "gpt-4o" in openai_models
+        anthropic_models = get_supported_models_by_provider(Provider.ANTHROPIC)
+        assert "claude-sonnet-4" in anthropic_models
 
 
 class TestOptimizationResult:
