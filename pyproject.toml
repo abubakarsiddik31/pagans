@@ -112,6 +112,7 @@ local_scheme = "no-local-version"
 [tool.ruff]
 line-length = 88
 target-version = "py312"
+extend-exclude = ["src/pagans/__version__.py", "src/pagans/_version.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N"]
@@ -120,8 +121,6 @@ ignore = ["E501"]
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["F841"]
 "src/pagans/models/__init__.py" = ["E402"]
-"src/pagans/__version__.py" = ["I001"]
-"src/pagans/_version.py" = ["I001"]
 
 [tool.black]
 line-length = 88
