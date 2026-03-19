@@ -1,10 +1,4 @@
-"""
-PAGANS - Prompts Aligned to Guidelines and Normalization System 😅
-
-A comprehensive Python package for optimizing prompts across different LLM model families.
-PAGANS provides tools to align your prompts with model-specific guidelines and normalization
-standards using the OpenRouter API.
-"""
+"""PAGANS package."""
 
 from .clients.openrouter import OpenRouterClient
 from .core import PAGANSOptimizer
@@ -40,9 +34,12 @@ from .optimizer_prompts import (
 )
 
 __version__ = "0.1.0"
-__author__ = "PAGANS Team"
+__author__ = "Abu Bakar Siddik"
 __email__ = "abubakar1808031@gmail.com"
-__description__ = "Prompts Aligned to Guidelines and Normalization System - Optimize prompts across LLM model families using OpenRouter"
+__description__ = (
+    "Prompts Aligned to Guidelines and Normalization System for LLM families "
+    "using OpenRouter"
+)
 
 # Main exports
 __all__ = [

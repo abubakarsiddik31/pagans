@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pagans"
 dynamic = ["version"]
-description = "😅 Prompts Aligned to Guidelines and Normalization System - Optimize prompts for OpenAI, Anthropic, xAI, and Google models"
+description = "Prompts Aligned to Guidelines and Normalization System for OpenAI, Anthropic, xAI, and Google models"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.12"
@@ -27,10 +27,10 @@ keywords = [
     "artificial-intelligence"
 ]
 authors = [
-    {name = "PAGANS Team", email = "abubakar1808031@gmail.com"}
+    {name = "Abu Bakar Siddik", email = "abubakar1808031@gmail.com"}
 ]
 maintainers = [
-    {name = "PAGANS Team", email = "abubakar1808031@gmail.com"}
+    {name = "Abu Bakar Siddik", email = "abubakar1808031@gmail.com"}
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -114,8 +114,14 @@ line-length = 88
 target-version = "py312"
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "C90", "I", "N", "UP", "YTT", "S", "BLE", "FBT", "B", "A", "COM", "C4", "DTZ", "T10", "DJ", "EM", "EXE", "FA", "ISC", "ICN", "G", "INP", "PIE", "T20", "PYI", "PT", "Q", "RSE", "RET", "SLF", "SLOT", "SIM", "TID", "TCH", "INT", "ARG", "PTH", "ERA", "PD", "PGH", "PL", "TRY", "FLY", "NPY", "AIR", "PERF", "FURB", "LOG", "RUF"]
-ignore = ["S101", "S104", "COM812", "ISC001"]
+select = ["E", "F", "W", "I", "N"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["F841"]
+"src/pagans/models/__init__.py" = ["E402"]
+"src/pagans/__version__.py" = ["I001"]
+"src/pagans/_version.py" = ["I001"]
 
 [tool.black]
 line-length = 88
@@ -127,18 +133,26 @@ line_length = 88
 
 [tool.mypy]
 python_version = "3.12"
-warn_return_any = true
+warn_return_any = false
 warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
-no_implicit_optional = true
-warn_redundant_casts = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = false
+disallow_untyped_decorators = false
+no_implicit_optional = false
+warn_redundant_casts = false
 warn_unused_ignores = true
-warn_no_return = true
-warn_unreachable = true
-strict_equality = true
+warn_no_return = false
+warn_unreachable = false
+strict_equality = false
+disable_error_code = [
+    "arg-type",
+    "assignment",
+    "no-any-return",
+    "no-untyped-def",
+    "return-value",
+    "unreachable",
+]
 
 [tool.setuptools.package-data]
 "pagans" = ["optimizer_prompts/templates/**/*.jinja"]

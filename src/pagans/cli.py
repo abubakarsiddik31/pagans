@@ -11,6 +11,21 @@ from typing import Any
 
 from .core import PAGANSOptimizer
 
+CLI_BANNER = r"""
+   ██████╗  █████╗  ██████╗  █████╗ ███╗   ██╗ ███████╗
+   ██╔══██╗██╔══██╗██╔════╝ ██╔══██╗████╗  ██║ ██╔════╝
+   ██████╔╝███████║██║  ███╗███████║██╔██╗ ██║ ███████╗
+   ██╔═══╝ ██╔══██║██║   ██║██╔══██║██║╚██╗██║ ╚════██║
+   ██║     ██║  ██║╚██████╔╝██║  ██║██║ ╚████║ ███████║
+   ╚═╝     ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝ ╚══════╝
+"""
+
+
+def _print_banner() -> None:
+    print(CLI_BANNER)
+    print("Prompts Aligned to Guidelines and Normalization System")
+    print()
+
 
 def _read_prompt(arg_value: str | None, file_value: str | None) -> str:
     if arg_value and file_value:
@@ -218,8 +233,11 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    show_banner = not getattr(args, "json", False)
 
     try:
+        if show_banner:
+            _print_banner()
         if args.command == "optimize":
             return asyncio.run(_run_optimize(args))
         if args.command == "compare":

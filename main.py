@@ -54,7 +54,7 @@ def display_pagans_icon(style="logo"):
 
 def main():
     display_pagans_icon("compact")
-    print("😅 Welcome to the future of prompt optimization!")
+    print("Welcome to PAGANS prompt optimization.")
     print("Optimize your prompts across OpenAI GPT, Anthropic Claude, and Google Gemini models.")
     print("Use 'pagans' command-line tool or import the library in your Python projects.")
     print("\nFor more information, visit: https://github.com/abubakarsiddik31/pagans")
